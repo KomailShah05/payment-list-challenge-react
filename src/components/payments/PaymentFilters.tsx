@@ -40,6 +40,7 @@ const PaymentFilters = memo(({
 
   return (
     <form
+      data-testid="payment-filters-form"
       action={formAction}
       role="search"
       className="flex flex-col gap-3 sm:flex-row sm:items-end sm:flex-wrap"
@@ -47,6 +48,7 @@ const PaymentFilters = memo(({
       {/* Payment ID search */}
       <div className="sm:w-72">
         <Input
+          data-testid="search-input"
           id="payment-search"
           name="search"
           type="search"
@@ -65,6 +67,7 @@ const PaymentFilters = memo(({
       <div className="sm:w-36">
         <Select
           key={currency}
+          data-testid="currency-select"
           id="currency-select"
           label={I18N.CURRENCY_FILTER_LABEL}
           aria-label={I18N.CURRENCY_FILTER_LABEL}
@@ -79,6 +82,7 @@ const PaymentFilters = memo(({
       </div>
 
       <Button
+        data-testid="search-button"
         type="submit"
         variant="primary"
         aria-label={I18N.SEARCH_BUTTON}
@@ -89,6 +93,7 @@ const PaymentFilters = memo(({
 
       {hasActiveFilters && (
         <Button
+          data-testid="clear-filters-button"
           type="button"
           variant="secondary"
           onClick={onClear}
@@ -104,6 +109,7 @@ const PaymentFilters = memo(({
           {I18N.PAGE_SIZE_LABEL}
         </label>
         <Select
+          data-testid="page-size-select"
           id="page-size-select"
           aria-label={I18N.PAGE_SIZE_LABEL}
           value={pageSize}

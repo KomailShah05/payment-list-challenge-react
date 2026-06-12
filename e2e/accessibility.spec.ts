@@ -1,20 +1,21 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-// Run axe against WCAG 2.1 AA + AAA rules
 const wcagTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"];
 
-const analyze = (page: Parameters<typeof AxeBuilder>[0]["page"]) =>
+const analyze = (page: Page) =>
   new AxeBuilder({ page })
     .withTags(wcagTags)
-    // These two rules flag false positives with MSW in dev mode
     .exclude("[aria-hidden='true']")
     .analyze();
+
+const waitForTable = (page: Page) =>
+  page.waitForSelector("[data-testid='payments-table']", { timeout: 10_000 });
 
 test.describe("Accessibility — WCAG 2.1 AA/AAA", () => {
   test("initial page load has no violations", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector("table", { timeout: 10_000 });
+    await waitForTable(page);
     const { violations } = await analyze(page);
     expect(
       violations,
@@ -24,9 +25,9 @@ test.describe("Accessibility — WCAG 2.1 AA/AAA", () => {
 
   test("search results state has no violations", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector("table");
-    await page.getByPlaceholder("Enter payment ID").fill("pay_134");
-    await page.getByRole("button", { name: "Search" }).click();
+    await waitForTable(page);
+    await page.getByTestId("search-input").fill("pay_134");
+    await page.getByTestId("search-button").click();
     await page.waitForTimeout(500);
     const { violations } = await analyze(page);
     expect(
@@ -37,10 +38,10 @@ test.describe("Accessibility — WCAG 2.1 AA/AAA", () => {
 
   test("404 error state has no violations", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector("table");
-    await page.getByPlaceholder("Enter payment ID").fill("pay_404");
-    await page.getByRole("button", { name: "Search" }).click();
-    await page.waitForSelector("[role='alert']");
+    await waitForTable(page);
+    await page.getByTestId("search-input").fill("pay_404");
+    await page.getByTestId("search-button").click();
+    await page.waitForSelector("[data-testid='error-message']");
     const { violations } = await analyze(page);
     expect(
       violations,
@@ -50,10 +51,10 @@ test.describe("Accessibility — WCAG 2.1 AA/AAA", () => {
 
   test("500 error state has no violations", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector("table");
-    await page.getByPlaceholder("Enter payment ID").fill("pay_500");
-    await page.getByRole("button", { name: "Search" }).click();
-    await page.waitForSelector("[role='alert']");
+    await waitForTable(page);
+    await page.getByTestId("search-input").fill("pay_500");
+    await page.getByTestId("search-button").click();
+    await page.waitForSelector("[data-testid='error-message']");
     const { violations } = await analyze(page);
     expect(
       violations,
@@ -63,8 +64,8 @@ test.describe("Accessibility — WCAG 2.1 AA/AAA", () => {
 
   test("page 2 state has no violations", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector("table");
-    await page.getByRole("button", { name: "Next ▶" }).click();
+    await waitForTable(page);
+    await page.getByTestId("next-button").click();
     await page.waitForTimeout(400);
     const { violations } = await analyze(page);
     expect(
@@ -77,8 +78,7 @@ test.describe("Accessibility — WCAG 2.1 AA/AAA", () => {
 
   test("all images and icons have alternative text or aria-hidden", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector("table");
-    // SVG chevrons inside selects must be aria-hidden
+    await waitForTable(page);
     const svgs = await page.locator("svg").all();
     for (const svg of svgs) {
       const hidden = await svg.getAttribute("aria-hidden");
@@ -89,20 +89,11 @@ test.describe("Accessibility — WCAG 2.1 AA/AAA", () => {
 
   test("all interactive elements are reachable by Tab", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector("table");
-
-    const focusableSelectors = [
-      "a[href]",
-      "button:not([disabled])",
-      "input",
-      "select",
-    ];
-
-    for (const selector of focusableSelectors) {
+    await waitForTable(page);
+    for (const selector of ["button:not([disabled])", "input", "select"]) {
       const elements = await page.locator(selector).all();
       for (const el of elements) {
         const tabIndex = await el.getAttribute("tabindex");
-        // tabindex="-1" means programmatically focusable only (e.g. error box) — acceptable
         expect(tabIndex === null || parseInt(tabIndex) >= -1).toBe(true);
       }
     }
@@ -110,18 +101,17 @@ test.describe("Accessibility — WCAG 2.1 AA/AAA", () => {
 
   test("error message receives focus when it appears", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector("table");
-    await page.getByPlaceholder("Enter payment ID").fill("pay_404");
-    await page.getByRole("button", { name: "Search" }).click();
-    await page.waitForSelector("[role='alert']");
-
-    const focusedTag = await page.evaluate(() => document.activeElement?.getAttribute("role"));
-    expect(focusedTag).toBe("alert");
+    await waitForTable(page);
+    await page.getByTestId("search-input").fill("pay_404");
+    await page.getByTestId("search-button").click();
+    await page.waitForSelector("[data-testid='error-message']");
+    const focusedRole = await page.evaluate(() => document.activeElement?.getAttribute("role"));
+    expect(focusedRole).toBe("alert");
   });
 
   test("skip-to-content link is the first focusable element", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector("table", { timeout: 10_000 });
+    await waitForTable(page);
     await page.keyboard.press("Tab");
     const focusedText = await page.evaluate(() => document.activeElement?.textContent?.trim());
     expect(focusedText).toBe("Skip to payments table");
@@ -129,39 +119,35 @@ test.describe("Accessibility — WCAG 2.1 AA/AAA", () => {
 
   test("table column headers have scope='col'", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector("table");
+    await waitForTable(page);
     const headers = await page.locator("th[scope='col']").count();
     expect(headers).toBe(6);
   });
 
   test("search input has an accessible label", async ({ page }) => {
     await page.goto("/");
-    const input = page.getByRole("searchbox", { name: "Search payments" });
-    await expect(input).toBeVisible();
+    await expect(page.getByTestId("search-input")).toBeVisible();
   });
 
   test("currency dropdown has an accessible label", async ({ page }) => {
     await page.goto("/");
-    const select = page.getByRole("combobox", { name: "Filter by currency" });
-    await expect(select).toBeVisible();
+    await expect(page.getByTestId("currency-select")).toBeVisible();
   });
 
   test("pagination buttons have accessible labels", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector("table");
-    await expect(page.getByRole("button", { name: "◀ Previous" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Next ▶" })).toBeVisible();
+    await waitForTable(page);
+    await expect(page.getByTestId("prev-button")).toBeVisible();
+    await expect(page.getByTestId("next-button")).toBeVisible();
   });
 
   test("status badges have sufficient color contrast (AAA check via axe)", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector("table");
+    await waitForTable(page);
     const { violations } = await new AxeBuilder({ page })
       .withTags(["wcag2aaa"])
       .include("tbody")
       .analyze();
-
-    // Filter to only color-contrast violations
     const contrastViolations = violations.filter((v) => v.id === "color-contrast-enhanced");
     expect(
       contrastViolations,

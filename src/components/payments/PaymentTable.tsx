@@ -13,6 +13,7 @@ interface PaymentTableProps {
 const PaymentTable = memo(({ payments, isLoading, pageSize }: PaymentTableProps) => (
   <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
     <table
+      data-testid="payments-table"
       role="table"
       aria-busy={isLoading}
       aria-label={I18N.PAGE_TITLE}

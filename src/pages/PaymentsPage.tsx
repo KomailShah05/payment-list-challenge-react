@@ -128,6 +128,7 @@ export const PaymentsPage = () => {
         {/* Error — focusable so keyboard/screen-reader users are immediately aware */}
         {error && (
           <div
+            data-testid="error-message"
             ref={errorRef}
             role="alert"
             aria-live="assertive"

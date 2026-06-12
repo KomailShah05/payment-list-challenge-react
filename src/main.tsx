@@ -10,7 +10,7 @@ async function enableMocking() {
 
   try {
     const { worker } = await import('./mocks/browser');
-    await worker.start();
+    await worker.start({ onUnhandledRequest: 'bypass' });
     console.log('Mock Service Worker started');
   } catch (error) {
     console.error('Failed to start Mock Service Worker:', error);

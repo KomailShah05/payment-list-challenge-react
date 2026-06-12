@@ -1,5 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from "react";
-import { I18N } from "../constants/i18n";
+import { I18N } from "../constants";
 
 interface Props {
   children: ReactNode;

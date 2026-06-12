@@ -1,5 +1,5 @@
 import { API_URL } from "../constants";
-import { PaymentSearchParams, PaymentSearchResponse } from "../types/payment";
+import { PaymentSearchParams, PaymentSearchResponse } from "../types";
 import apiClient from "./client";
 
 export const fetchPayments = async (
@@ -8,13 +8,12 @@ export const fetchPayments = async (
 ): Promise<PaymentSearchResponse> => {
   const { data } = await apiClient.get<PaymentSearchResponse>(API_URL, {
     params: {
-      search: params.search ?? "",
+      search:   params.search   ?? "",
       currency: params.currency ?? "",
-      page: params.page ?? 1,
+      page:     params.page     ?? 1,
       pageSize: params.pageSize ?? 5,
     },
     signal,
   });
-
   return data;
 };

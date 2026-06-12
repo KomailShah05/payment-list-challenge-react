@@ -1,6 +1,5 @@
-import { memo, KeyboardEvent, useCallback } from "react";
-import { I18N } from "../../constants/i18n";
-import { CURRENCIES } from "../../constants";
+import { memo, useActionState } from "react";
+import { I18N, CURRENCIES, PAGE_SIZE_OPTIONS, PageSizeOption } from "../../constants";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
 import Button from "../ui/Button";
@@ -8,38 +7,48 @@ import Button from "../ui/Button";
 interface PaymentFiltersProps {
   inputValue: string;
   currency: string;
+  pageSize: number;
   hasActiveFilters: boolean;
   onInputChange: (value: string) => void;
-  onSearch: () => void;
+  onSearch: (value: string) => void;
   onCurrencyChange: (currency: string) => void;
+  onPageSizeChange: (pageSize: PageSizeOption) => void;
   onClear: () => void;
 }
 
 const PaymentFilters = memo(({
   inputValue,
   currency,
+  pageSize,
   hasActiveFilters,
   onInputChange,
   onSearch,
   onCurrencyChange,
+  onPageSizeChange,
   onClear,
 }: PaymentFiltersProps) => {
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "Enter") onSearch();
+  // useActionState (React 19) — manages the form's async action lifecycle.
+  // `isPending` drives the button's disabled/loading state for free.
+  const [, formAction, isPending] = useActionState(
+    async (_prevState: null, formData: FormData) => {
+      const search = (formData.get("search") as string ?? "").trim();
+      onSearch(search);
+      return null;
     },
-    [onSearch]
+    null
   );
 
   return (
     <form
+      action={formAction}
       role="search"
-      onSubmit={(e) => { e.preventDefault(); onSearch(); }}
       className="flex flex-col gap-3 sm:flex-row sm:items-end sm:flex-wrap"
     >
+      {/* Payment ID search */}
       <div className="sm:w-72">
         <Input
           id="payment-search"
+          name="search"
           type="search"
           role="searchbox"
           label={I18N.SEARCH_LABEL}
@@ -49,10 +58,10 @@ const PaymentFilters = memo(({
           maxLength={100}
           autoComplete="off"
           onChange={(e) => onInputChange(e.target.value)}
-          onKeyDown={handleKeyDown}
         />
       </div>
 
+      {/* Currency filter */}
       <div className="sm:w-36">
         <Select
           id="currency-select"
@@ -68,8 +77,13 @@ const PaymentFilters = memo(({
         </Select>
       </div>
 
-      <Button type="submit" variant="primary" aria-label={I18N.SEARCH_BUTTON}>
-        {I18N.SEARCH_BUTTON}
+      <Button
+        type="submit"
+        variant="primary"
+        aria-label={I18N.SEARCH_BUTTON}
+        disabled={isPending}
+      >
+        {isPending ? "Searching…" : I18N.SEARCH_BUTTON}
       </Button>
 
       {hasActiveFilters && (
@@ -82,6 +96,24 @@ const PaymentFilters = memo(({
           {I18N.CLEAR_FILTERS}
         </Button>
       )}
+
+      {/* Page size — right-aligned */}
+      <div className="flex items-center gap-2 sm:ml-auto">
+        <label htmlFor="page-size-select" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+          {I18N.PAGE_SIZE_LABEL}
+        </label>
+        <Select
+          id="page-size-select"
+          aria-label={I18N.PAGE_SIZE_LABEL}
+          value={pageSize}
+          onChange={(e) => onPageSizeChange(Number(e.target.value) as PageSizeOption)}
+          className="w-20"
+        >
+          {PAGE_SIZE_OPTIONS.map((size) => (
+            <option key={size} value={size}>{size}</option>
+          ))}
+        </Select>
+      </div>
     </form>
   );
 });

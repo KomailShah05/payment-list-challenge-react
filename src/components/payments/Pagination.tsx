@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { I18N } from "../../constants/i18n";
+import { I18N } from "../../constants";
 import Button from "../ui/Button";
 
 interface PaginationProps {
@@ -22,7 +22,7 @@ const Pagination = memo(({ page, totalPages, onPrevious, onNext }: PaginationPro
     </Button>
 
     <span
-      className="text-sm text-gray-600"
+      className="text-sm font-medium text-gray-700"
       aria-live="polite"
       aria-atomic="true"
     >

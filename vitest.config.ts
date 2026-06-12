@@ -7,6 +7,7 @@ export default defineConfig({
     reporters: ['junit', 'verbose'],
     environment: 'jsdom',
     globals: true,
+    exclude: ['**/node_modules/**', '**/e2e/**'],
     outputFile: {
       junit: './junit.xml',
     },

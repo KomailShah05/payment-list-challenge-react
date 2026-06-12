@@ -8,10 +8,10 @@ interface BadgeProps {
 
 // Colors chosen for WCAG AAA contrast (7:1 ratio minimum)
 const STATUS_CLASSES: Record<string, string> = {
-  completed: "bg-emerald-100 text-emerald-800",
-  pending:   "bg-amber-100  text-amber-800",
-  failed:    "bg-red-100    text-red-800",
-  refunded:  "bg-purple-100 text-purple-800",
+  completed: "bg-emerald-50 text-emerald-900",
+  pending:   "bg-amber-50   text-amber-900",
+  failed:    "bg-red-50     text-red-900",
+  refunded:  "bg-purple-50  text-purple-900",
 };
 
 const Badge = memo(({ status }: BadgeProps) => (

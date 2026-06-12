@@ -1,44 +1,58 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { PaymentFilters, PaymentFiltersActions } from "../types";
+import { DEFAULT_PAGE_SIZE, INITIAL_FILTERS, PAGE_SIZE_OPTIONS } from "../constants";
+import type { PageSizeOption } from "../constants";
 
-export interface PaymentFilters {
-  inputValue: string;
-  committedSearch: string;
-  currency: string;
-  page: number;
-}
+// navigator.userAgent includes "jsdom" in the Vitest jsdom environment
+const isBrowser =
+  typeof window !== "undefined" &&
+  typeof window.history?.replaceState === "function" &&
+  !navigator.userAgent.includes("jsdom");
 
-export interface PaymentFiltersActions {
-  setInputValue: (value: string) => void;
-  commitSearch: () => void;
-  setCurrency: (currency: string) => void;
-  setPage: (page: number) => void;
-  clearFilters: () => void;
-}
+const readFromUrl = (): PaymentFilters => {
+  if (!isBrowser) return INITIAL_FILTERS;
+  const params = new URLSearchParams(window.location.search);
+  const search = params.get("search") ?? "";
+  const currency = params.get("currency") ?? "";
+  const page = Math.max(1, parseInt(params.get("page") ?? "1", 10) || 1);
+  const rawSize = parseInt(params.get("pageSize") ?? String(DEFAULT_PAGE_SIZE), 10);
+  const pageSize = (PAGE_SIZE_OPTIONS as readonly number[]).includes(rawSize)
+    ? (rawSize as PageSizeOption)
+    : DEFAULT_PAGE_SIZE;
 
-const INITIAL_STATE: PaymentFilters = {
-  inputValue: "",
-  committedSearch: "",
-  currency: "",
-  page: 1,
+  return { inputValue: search, committedSearch: search, currency, page, pageSize };
+};
+
+const syncToUrl = (filters: PaymentFilters) => {
+  if (!isBrowser) return;
+  const params = new URLSearchParams();
+  if (filters.committedSearch) params.set("search", filters.committedSearch);
+  if (filters.currency) params.set("currency", filters.currency);
+  if (filters.page > 1) params.set("page", String(filters.page));
+  if (filters.pageSize !== DEFAULT_PAGE_SIZE) params.set("pageSize", String(filters.pageSize));
+  const qs = params.toString();
+  window.history.replaceState(null, "", qs ? `?${qs}` : window.location.pathname);
 };
 
 const usePaymentFilters = (): [PaymentFilters, PaymentFiltersActions] => {
-  const [filters, setFilters] = useState<PaymentFilters>(INITIAL_STATE);
+  const [filters, setFilters] = useState<PaymentFilters>(readFromUrl);
+
+  useEffect(() => {
+    syncToUrl(filters);
+  }, [filters]);
 
   const setInputValue = useCallback((value: string) => {
     setFilters((prev) => ({ ...prev, inputValue: value }));
   }, []);
 
-  // Commits the typed input as the active search and resets to page 1
-  const commitSearch = useCallback(() => {
+  const commitSearch = useCallback((value?: string) => {
     setFilters((prev) => ({
       ...prev,
-      committedSearch: prev.inputValue.trim(),
+      committedSearch: (value ?? prev.inputValue).trim(),
       page: 1,
     }));
   }, []);
 
-  // Currency change is immediately reactive — no button click needed
   const setCurrency = useCallback((currency: string) => {
     setFilters((prev) => ({ ...prev, currency, page: 1 }));
   }, []);
@@ -47,8 +61,12 @@ const usePaymentFilters = (): [PaymentFilters, PaymentFiltersActions] => {
     setFilters((prev) => ({ ...prev, page }));
   }, []);
 
+  const setPageSize = useCallback((pageSize: number) => {
+    setFilters((prev) => ({ ...prev, pageSize: pageSize as PageSizeOption, page: 1 }));
+  }, []);
+
   const clearFilters = useCallback(() => {
-    setFilters(INITIAL_STATE);
+    setFilters(INITIAL_FILTERS);
   }, []);
 
   const actions: PaymentFiltersActions = {
@@ -56,6 +74,7 @@ const usePaymentFilters = (): [PaymentFilters, PaymentFiltersActions] => {
     commitSearch,
     setCurrency,
     setPage,
+    setPageSize,
     clearFilters,
   };
 

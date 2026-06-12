@@ -1,10 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { fetchPayments } from "../api/payments";
-import { PaymentSearchParams } from "../types/payment";
-
-const PAGE_SIZE = 5;
-const STALE_TIME = 30_000; // 30 seconds — avoid unnecessary refetches
+import { PaymentSearchParams, PaymentSearchResponse } from "../types";
+import { STALE_TIME_MS } from "../constants";
 
 export const paymentsQueryKey = (params: PaymentSearchParams) =>
   ["payments", params] as const;
@@ -12,30 +10,30 @@ export const paymentsQueryKey = (params: PaymentSearchParams) =>
 const usePayments = (params: PaymentSearchParams) => {
   const queryClient = useQueryClient();
 
-  const query = useQuery({
+  const query = useQuery<PaymentSearchResponse>({
     queryKey: paymentsQueryKey(params),
     queryFn: ({ signal }) => fetchPayments(params, signal),
-    staleTime: STALE_TIME,
-    placeholderData: (prev) => prev, // keep previous data visible while fetching next page
+    staleTime: STALE_TIME_MS,
+    placeholderData: (prev) => prev,
   });
 
-  // Prefetch next page in the background so pagination feels instant
+  const { data } = query;
+
+  // Prefetch the next page in the background so pagination feels instant
   useEffect(() => {
-    const { data } = query;
     if (!data) return;
 
-    const totalPages = Math.ceil(data.total / PAGE_SIZE);
-    const nextPage = (params.page ?? 1) + 1;
+    const totalPages = Math.ceil(data.total / (params.pageSize ?? 5));
+    const nextPage   = (params.page ?? 1) + 1;
 
     if (nextPage <= totalPages) {
       queryClient.prefetchQuery({
         queryKey: paymentsQueryKey({ ...params, page: nextPage }),
-        queryFn: ({ signal }) =>
-          fetchPayments({ ...params, page: nextPage }, signal),
-        staleTime: STALE_TIME,
+        queryFn:  ({ signal }) => fetchPayments({ ...params, page: nextPage }, signal),
+        staleTime: STALE_TIME_MS,
       });
     }
-  }, [query.data, params, queryClient]);
+  }, [data, params, queryClient]);
 
   return query;
 };

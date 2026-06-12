@@ -2,6 +2,7 @@ import {
   useCallback,
   useDeferredValue,
   useEffect,
+  useMemo,
   useOptimistic,
   useRef,
   startTransition,
@@ -32,18 +33,21 @@ export const PaymentsPage = () => {
   const deferredInput = useDeferredValue(filters.inputValue);
   const [optimisticCurrency, setOptimisticCurrency] = useOptimistic(filters.currency);
 
-  const queryParams = {
-    search:   filters.committedSearch,
-    currency: optimisticCurrency,
+  // Memoised so the object reference only changes when values actually change.
+  // Without this, useEffect inside usePayments fires on every render because
+  // a new object is created each time — causing redundant prefetch calls.
+  const queryParams = useMemo(() => ({
+    search:   filters.committedSearch || undefined,
+    currency: optimisticCurrency      || undefined,
     page:     filters.page,
     pageSize: filters.pageSize,
-  };
+  }), [filters.committedSearch, optimisticCurrency, filters.page, filters.pageSize]);
 
   const { data, isFetching, isLoading, error } = usePayments(queryParams);
   const progress = useLoadingProgress(isFetching);
 
   const totalPages       = data ? Math.ceil(data.total / filters.pageSize) : 1;
-  const hasActiveFilters = filters.committedSearch !== "" || filters.currency !== "";
+  const hasActiveFilters = filters.committedSearch !== "" || optimisticCurrency !== "";
 
   // Focus the error box when it first appears so screen readers announce it
   const errorRef = useRef<HTMLDivElement>(null);
@@ -59,9 +63,9 @@ export const PaymentsPage = () => {
       if ((CURRENCIES as readonly string[]).includes(upper)) {
         actions.setInputValue("");
         actions.commitSearch("");
+        actions.setCurrency(upper);  // urgent — commits filters.currency immediately
         startTransition(() => {
           setOptimisticCurrency(upper);
-          actions.setCurrency(upper);
         });
       } else {
         actions.commitSearch(value);
@@ -72,9 +76,14 @@ export const PaymentsPage = () => {
 
   const handleCurrencyChange = useCallback(
     (currency: string) => {
+      // Commit the real state urgently so filters.currency is always up-to-date
+      // during any concurrent render (e.g. the urgent re-render that fires when
+      // the user clears the search input). The optimistic update only needs to
+      // cover the brief moment before the state commit — so keep it in a
+      // transition but don't put setCurrency in there.
+      actions.setCurrency(currency);
       startTransition(() => {
         setOptimisticCurrency(currency);
-        actions.setCurrency(currency);
       });
     },
     [actions, setOptimisticCurrency]
@@ -114,7 +123,7 @@ export const PaymentsPage = () => {
         <div className="mb-6">
           <PaymentFilters
             inputValue={deferredInput !== filters.inputValue ? filters.inputValue : deferredInput}
-            currency={filters.currency}
+            currency={optimisticCurrency}
             pageSize={filters.pageSize}
             hasActiveFilters={hasActiveFilters}
             onInputChange={actions.setInputValue}
@@ -154,6 +163,7 @@ export const PaymentsPage = () => {
             <PaymentTable
               payments={data?.payments ?? []}
               isLoading={isLoading}
+              isFetching={isFetching}
               pageSize={filters.pageSize}
             />
             <Pagination

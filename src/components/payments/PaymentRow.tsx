@@ -6,9 +6,10 @@ import Badge from "../ui/Badge";
 
 interface PaymentRowProps {
   payment: Payment;
+  index?: number;
 }
 
-const PaymentRow = memo(({ payment }: PaymentRowProps) => {
+const PaymentRow = memo(({ payment, index = 0 }: PaymentRowProps) => {
   const formattedAmount = useMemo(
     () => formatAmount(payment.amount, payment.currency),
     [payment.amount, payment.currency]
@@ -20,7 +21,10 @@ const PaymentRow = memo(({ payment }: PaymentRowProps) => {
   );
 
   return (
-    <tr className="border-b border-gray-100 hover:bg-slate-50 transition-colors duration-150">
+    <tr
+      className="border-b border-gray-100 hover:bg-slate-50 transition-colors duration-150 animate-fade-slide-in"
+      style={{ animationDelay: `${index * 30}ms` }}
+    >
       <td className="px-4 py-3 text-sm font-mono text-gray-900">{payment.id}</td>
       <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{formattedDate}</td>
       <td className="px-4 py-3 text-sm font-medium text-gray-900 tabular-nums">{formattedAmount}</td>

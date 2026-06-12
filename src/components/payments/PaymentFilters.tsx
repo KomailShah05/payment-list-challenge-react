@@ -1,6 +1,5 @@
 import { memo, useActionState } from "react";
 import { I18N, CURRENCIES, PAGE_SIZE_OPTIONS, PageSizeOption } from "../../constants";
-import Input from "../ui/Input";
 import Select from "../ui/Select";
 import Button from "../ui/Button";
 
@@ -27,8 +26,6 @@ const PaymentFilters = memo(({
   onPageSizeChange,
   onClear,
 }: PaymentFiltersProps) => {
-  // useActionState (React 19) — manages the form's async action lifecycle.
-  // `isPending` drives the button's disabled/loading state for free.
   const [, formAction, isPending] = useActionState(
     async (_prevState: null, formData: FormData) => {
       const search = (formData.get("search") as string ?? "").trim();
@@ -43,30 +40,52 @@ const PaymentFilters = memo(({
       data-testid="payment-filters-form"
       action={formAction}
       role="search"
+      // Prevent any native form reset from clearing controlled fields
+      onReset={(e) => e.preventDefault()}
       className="flex flex-col gap-3 sm:flex-row sm:items-end sm:flex-wrap"
     >
-      {/* Payment ID search */}
-      <div className="sm:w-72">
-        <Input
-          data-testid="search-input"
-          id="payment-search"
-          name="search"
-          type="search"
-          role="searchbox"
-          label={I18N.SEARCH_LABEL}
-          placeholder={I18N.SEARCH_PLACEHOLDER}
-          aria-label={I18N.SEARCH_LABEL}
-          value={inputValue}
-          maxLength={100}
-          autoComplete="off"
-          onChange={(e) => onInputChange(e.target.value)}
-        />
+      {/* Search input — type="text" so the browser's native × button on
+          type="search" never fires a form reset event that clobbers the
+          currency select. We provide our own inline clear button instead. */}
+      <div className="sm:w-96">
+        <div className="flex flex-col gap-1">
+          <label htmlFor="payment-search" className="sr-only">
+            {I18N.SEARCH_LABEL}
+          </label>
+          <div className="relative">
+            <input
+              data-testid="search-input"
+              id="payment-search"
+              name="search"
+              type="text"
+              role="searchbox"
+              aria-label={I18N.SEARCH_LABEL}
+              placeholder={I18N.SEARCH_PLACEHOLDER}
+              value={inputValue}
+              maxLength={100}
+              autoComplete="off"
+              onChange={(e) => onInputChange(e.target.value)}
+              className="w-full rounded-md border border-gray-300 py-2 pl-3 pr-8 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+            {inputValue && (
+              <button
+                type="button"
+                aria-label="Clear search"
+                onClick={() => onInputChange("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+              >
+                <svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Currency filter */}
       <div className="sm:w-36">
         <Select
-          key={currency}
           data-testid="currency-select"
           id="currency-select"
           label={I18N.CURRENCY_FILTER_LABEL}
@@ -88,20 +107,24 @@ const PaymentFilters = memo(({
         aria-label={I18N.SEARCH_BUTTON}
         disabled={isPending}
       >
-        {isPending ? "Searching…" : I18N.SEARCH_BUTTON}
+        {I18N.SEARCH_BUTTON}
       </Button>
 
-      {hasActiveFilters && (
-        <Button
-          data-testid="clear-filters-button"
-          type="button"
-          variant="secondary"
-          onClick={onClear}
-          aria-label={I18N.CLEAR_FILTERS}
-        >
-          {I18N.CLEAR_FILTERS}
-        </Button>
-      )}
+      {/* Always rendered — opacity toggle avoids layout shift */}
+      <Button
+        data-testid="clear-filters-button"
+        type="button"
+        variant="secondary"
+        onClick={onClear}
+        aria-label={I18N.CLEAR_FILTERS}
+        aria-hidden={!hasActiveFilters}
+        tabIndex={hasActiveFilters ? 0 : -1}
+        className={`transition-opacity duration-200 ${
+          hasActiveFilters ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        {I18N.CLEAR_FILTERS}
+      </Button>
 
       {/* Page size — right-aligned */}
       <div className="flex items-center gap-2 sm:ml-auto">

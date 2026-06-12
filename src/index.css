@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+@layer utilities {
+  .animate-fade-slide-in {
+    animation: fadeSlideIn 0.18s ease-out both;
+  }
+}
+
 @layer base {
   :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;

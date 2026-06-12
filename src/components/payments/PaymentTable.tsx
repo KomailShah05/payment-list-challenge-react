@@ -7,15 +7,16 @@ import SkeletonRow from "../ui/Skeleton";
 interface PaymentTableProps {
   payments: Payment[];
   isLoading: boolean;
+  isFetching: boolean;
   pageSize: number;
 }
 
-const PaymentTable = memo(({ payments, isLoading, pageSize }: PaymentTableProps) => (
+const PaymentTable = memo(({ payments, isLoading, isFetching, pageSize }: PaymentTableProps) => (
   <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
     <table
       data-testid="payments-table"
       role="table"
-      aria-busy={isLoading}
+      aria-busy={isLoading || isFetching}
       aria-label={I18N.PAGE_TITLE}
       className="min-w-full text-left text-sm"
     >
@@ -34,13 +35,18 @@ const PaymentTable = memo(({ payments, isLoading, pageSize }: PaymentTableProps)
           ))}
         </tr>
       </thead>
-      <tbody className="divide-y divide-gray-100 bg-white">
+      {/* Dim the body while a background refetch is in flight; skeleton on first load */}
+      <tbody
+        className={`divide-y divide-gray-100 bg-white transition-opacity duration-300 ${
+          isFetching && !isLoading ? "opacity-50" : "opacity-100"
+        }`}
+      >
         {isLoading
           ? Array.from({ length: pageSize }).map((_, i) => (
               <SkeletonRow key={i} columns={6} />
             ))
-          : payments.map((payment) => (
-              <PaymentRow key={payment.id} payment={payment} />
+          : payments.map((payment, i) => (
+              <PaymentRow key={payment.id} payment={payment} index={i} />
             ))}
       </tbody>
     </table>

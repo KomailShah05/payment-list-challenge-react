@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="11" failures="0" errors="0" time="0.263882083">
-    <testsuite name="src/App.test.tsx" timestamp="2026-06-12T17:35:42.461Z" hostname="Mac.powerhub" tests="11" failures="0" errors="0" skipped="0" time="0.263882083">
-        <testcase classname="src/App.test.tsx" name="App - Step 1: Basic Payment List &gt; should fetch and display payments in a table with page=1 and pageSize=5" time="0.114064417">
-            <system-err>
-[Profiler] &lt;PaymentsPage&gt; (update) took 28.7ms — threshold: 16ms
-
-            </system-err>
+<testsuites name="vitest tests" tests="11" failures="0" errors="0" time="0.254482375">
+    <testsuite name="src/App.test.tsx" timestamp="2026-06-12T18:27:45.451Z" hostname="Mac.powerhub" tests="11" failures="0" errors="0" skipped="0" time="0.254482375">
+        <testcase classname="src/App.test.tsx" name="App - Step 1: Basic Payment List &gt; should fetch and display payments in a table with page=1 and pageSize=5" time="0.104960375">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 2: Search by Payment ID &gt; should have a search input for payment ID" time="0.005560959">
+        <testcase classname="src/App.test.tsx" name="App - Step 2: Search by Payment ID &gt; should have a search input for payment ID" time="0.0065755">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 2: Search by Payment ID &gt; should search for payments by payment ID" time="0.029491375">
+        <testcase classname="src/App.test.tsx" name="App - Step 2: Search by Payment ID &gt; should search for payments by payment ID" time="0.029693292">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 3: Clear Filters &gt; should clear all filters when clear button is clicked" time="0.014505084">
+        <testcase classname="src/App.test.tsx" name="App - Step 3: Clear Filters &gt; should clear all filters when clear button is clicked" time="0.016728417">
             <system-err>
 A component suspended inside an `act` scope, but the `act` call was not awaited. When testing React components that depend on asynchronous data, you must await the result:
 
@@ -19,19 +15,19 @@ await act(() =&gt; ...)
 
             </system-err>
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 4: Handle Payment Not Found &gt; should display error message when payment ID is not found" time="0.017557584">
+        <testcase classname="src/App.test.tsx" name="App - Step 4: Handle Payment Not Found &gt; should display error message when payment ID is not found" time="0.023219083">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 5: Handle Server Error &gt; should display error message when API returns 500" time="0.028893208">
+        <testcase classname="src/App.test.tsx" name="App - Step 5: Handle Server Error &gt; should display error message when API returns 500" time="0.017170667">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 6: Currency Filter &gt; should have a currency filter dropdown" time="0.006067458">
+        <testcase classname="src/App.test.tsx" name="App - Step 6: Currency Filter &gt; should have a currency filter dropdown" time="0.0057585">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 6: Currency Filter &gt; should filter payments by currency when selected" time="0.011250417">
+        <testcase classname="src/App.test.tsx" name="App - Step 6: Currency Filter &gt; should filter payments by currency when selected" time="0.010724541">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 7: Combined Currency and Payment ID Filter &gt; should filter by both currency and payment ID" time="0.0126805">
+        <testcase classname="src/App.test.tsx" name="App - Step 7: Combined Currency and Payment ID Filter &gt; should filter by both currency and payment ID" time="0.014222958">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 8: Pagination &gt; should display pagination controls" time="0.011657125">
+        <testcase classname="src/App.test.tsx" name="App - Step 8: Pagination &gt; should display pagination controls" time="0.012671375">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 8: Pagination &gt; should disable previous button on first page" time="0.010567209">
+        <testcase classname="src/App.test.tsx" name="App - Step 8: Pagination &gt; should disable previous button on first page" time="0.011122083">
         </testcase>
     </testsuite>
 </testsuites>

@@ -6,10 +6,12 @@ export const fetchPayments = async (
   params: PaymentSearchParams,
   signal?: AbortSignal
 ): Promise<PaymentSearchResponse> => {
+  // Only include params that have a value — avoids ?search=&currency= noise
+  // and ensures cache keys are canonical (undefined === omitted).
   const { data } = await apiClient.get<PaymentSearchResponse>(API_URL, {
     params: {
-      search:   params.search   ?? "",
-      currency: params.currency ?? "",
+      ...(params.search   ? { search:   params.search   } : {}),
+      ...(params.currency ? { currency: params.currency } : {}),
       page:     params.page     ?? 1,
       pageSize: params.pageSize ?? 5,
     },

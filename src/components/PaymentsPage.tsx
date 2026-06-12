@@ -1,6 +1,1 @@
-import React from "react";
-import { Container } from './components'
-
-export const PaymentsPage = () => {
-  return <Container>Start here</Container>;
-};
+export { PaymentsPage } from "../pages/PaymentsPage";

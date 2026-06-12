@@ -3,9 +3,7 @@ import {
   useDeferredValue,
   useEffect,
   useMemo,
-  useOptimistic,
   useRef,
-  startTransition,
   Profiler,
 } from "react";
 import { I18N, PageSizeOption, CURRENCIES } from "../constants";
@@ -28,81 +26,104 @@ const getErrorMessage = (err: unknown): string => {
 
 export const PaymentsPage = () => {
   const [filters, actions] = usePaymentFilters();
-  const { onRenderCallback } = useObservability({ warnThresholdMs: 16 });
+  const { onRenderCallback, trackEvent, logError } = useObservability({ warnThresholdMs: 16 });
 
   const deferredInput = useDeferredValue(filters.inputValue);
-  const [optimisticCurrency, setOptimisticCurrency] = useOptimistic(filters.currency);
 
   // Memoised so the object reference only changes when values actually change.
   // Without this, useEffect inside usePayments fires on every render because
   // a new object is created each time — causing redundant prefetch calls.
   const queryParams = useMemo(() => ({
     search:   filters.committedSearch || undefined,
-    currency: optimisticCurrency      || undefined,
+    currency: filters.currency        || undefined,
     page:     filters.page,
     pageSize: filters.pageSize,
-  }), [filters.committedSearch, optimisticCurrency, filters.page, filters.pageSize]);
+  }), [filters.committedSearch, filters.currency, filters.page, filters.pageSize]);
 
   const { data, isFetching, isLoading, error } = usePayments(queryParams);
   const progress = useLoadingProgress(isFetching);
 
   const totalPages       = data ? Math.ceil(data.total / filters.pageSize) : 1;
-  const hasActiveFilters = filters.committedSearch !== "" || optimisticCurrency !== "";
+  const hasActiveFilters = filters.committedSearch !== "" || filters.currency !== "";
 
   // Focus the error box when it first appears so screen readers announce it
   const errorRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (error && errorRef.current) {
       errorRef.current.focus();
+      logError("payment_list_error_shown", {
+        statusCode: (error as { response?: { status?: number } })?.response?.status,
+        hasSearch: filters.committedSearch !== "",
+        currency: filters.currency || undefined,
+        page: filters.page,
+      });
     }
-  }, [error]);
+  }, [error, logError, filters.committedSearch, filters.currency, filters.page]);
+
+  // Search analytics: result counts and the no-results rate per filter combo.
+  // Query string itself is never logged — only its length (PII-safe).
+  useEffect(() => {
+    if (!data || !hasActiveFilters) return;
+    trackEvent("search_results", {
+      resultCount: data.total,
+      noResults: data.total === 0,
+      queryLength: filters.committedSearch.length,
+      currency: filters.currency || undefined,
+    });
+  }, [data, hasActiveFilters, trackEvent, filters.committedSearch, filters.currency]);
 
   const handleSearch = useCallback(
     (value: string) => {
       const upper = value.trim().toUpperCase() as typeof CURRENCIES[number];
-      if ((CURRENCIES as readonly string[]).includes(upper)) {
+      const isCurrencyShortcut = (CURRENCIES as readonly string[]).includes(upper);
+      trackEvent("search_performed", {
+        queryLength: value.trim().length,
+        isCurrencyShortcut,
+      });
+      if (isCurrencyShortcut) {
         actions.setInputValue("");
         actions.commitSearch("");
-        actions.setCurrency(upper);  // urgent — commits filters.currency immediately
-        startTransition(() => {
-          setOptimisticCurrency(upper);
-        });
+        actions.setCurrency(upper);
       } else {
         actions.commitSearch(value);
       }
     },
-    [actions, setOptimisticCurrency]
+    [actions, trackEvent]
   );
 
   const handleCurrencyChange = useCallback(
     (currency: string) => {
-      // Commit the real state urgently so filters.currency is always up-to-date
-      // during any concurrent render (e.g. the urgent re-render that fires when
-      // the user clears the search input). The optimistic update only needs to
-      // cover the brief moment before the state commit — so keep it in a
-      // transition but don't put setCurrency in there.
+      trackEvent("currency_filter_changed", { currency: currency || "all" });
       actions.setCurrency(currency);
-      startTransition(() => {
-        setOptimisticCurrency(currency);
-      });
     },
-    [actions, setOptimisticCurrency]
+    [actions, trackEvent]
   );
 
   const handlePageSizeChange = useCallback(
-    (size: PageSizeOption) => actions.setPageSize(size),
-    [actions]
+    (size: PageSizeOption) => {
+      trackEvent("pagination_changed", { pageSize: size, page: 1 });
+      actions.setPageSize(size);
+    },
+    [actions, trackEvent]
   );
 
-  const handlePrevious = useCallback(
-    () => actions.setPage(filters.page - 1),
-    [actions, filters.page]
-  );
+  const handlePrevious = useCallback(() => {
+    trackEvent("pagination_changed", { page: filters.page - 1, direction: "previous" });
+    actions.setPage(filters.page - 1);
+  }, [actions, filters.page, trackEvent]);
 
-  const handleNext = useCallback(
-    () => actions.setPage(filters.page + 1),
-    [actions, filters.page]
-  );
+  const handleNext = useCallback(() => {
+    trackEvent("pagination_changed", { page: filters.page + 1, direction: "next" });
+    actions.setPage(filters.page + 1);
+  }, [actions, filters.page, trackEvent]);
+
+  const handleClear = useCallback(() => {
+    trackEvent("filters_cleared", {
+      hadSearch: filters.committedSearch !== "",
+      hadCurrency: filters.currency !== "",
+    });
+    actions.clearFilters();
+  }, [actions, filters.committedSearch, filters.currency, trackEvent]);
 
   return (
     <Profiler id="PaymentsPage" onRender={onRenderCallback}>
@@ -123,14 +144,14 @@ export const PaymentsPage = () => {
         <div className="mb-6">
           <PaymentFilters
             inputValue={deferredInput !== filters.inputValue ? filters.inputValue : deferredInput}
-            currency={optimisticCurrency}
+            currency={filters.currency}
             pageSize={filters.pageSize}
             hasActiveFilters={hasActiveFilters}
             onInputChange={actions.setInputValue}
             onSearch={handleSearch}
             onCurrencyChange={handleCurrencyChange}
             onPageSizeChange={handlePageSizeChange}
-            onClear={actions.clearFilters}
+            onClear={handleClear}
           />
         </div>
 

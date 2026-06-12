@@ -1,4 +1,4 @@
-import { memo, useActionState } from "react";
+import { memo, FormEvent, useCallback } from "react";
 import { I18N, CURRENCIES, PAGE_SIZE_OPTIONS, PageSizeOption } from "../../constants";
 import Select from "../ui/Select";
 import Button from "../ui/Button";
@@ -26,19 +26,24 @@ const PaymentFilters = memo(({
   onPageSizeChange,
   onClear,
 }: PaymentFiltersProps) => {
-  const [, formAction, isPending] = useActionState(
-    async (_prevState: null, formData: FormData) => {
-      const search = (formData.get("search") as string ?? "").trim();
-      onSearch(search);
-      return null;
+  // Plain submit handler — deliberately NOT a React 19 form action.
+  // Form actions (useActionState + <form action>) make React call
+  // requestFormReset after the action resolves, which visually resets
+  // form controls (notably the currency <select>) back to their initial
+  // DOM value even though React state is unchanged. A classic onSubmit
+  // has no such reset behaviour.
+  const handleSubmit = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      onSearch(inputValue.trim());
     },
-    null
+    [inputValue, onSearch]
   );
 
   return (
     <form
       data-testid="payment-filters-form"
-      action={formAction}
+      onSubmit={handleSubmit}
       role="search"
       // Prevent any native form reset from clearing controlled fields
       onReset={(e) => e.preventDefault()}
@@ -105,7 +110,6 @@ const PaymentFilters = memo(({
         type="submit"
         variant="primary"
         aria-label={I18N.SEARCH_BUTTON}
-        disabled={isPending}
       >
         {I18N.SEARCH_BUTTON}
       </Button>

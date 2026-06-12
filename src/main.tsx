@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+import { initWebVitals } from './observability/webVitals';
 
 async function enableMocking() {
   if (process.env.NODE_ENV !== 'development') {
@@ -16,6 +17,9 @@ async function enableMocking() {
     console.error('Failed to start Mock Service Worker:', error);
   }
 }
+
+// Core Web Vitals (LCP / CLS / INP) → telemetry
+initWebVitals();
 
 enableMocking().then(() => {
   ReactDOM.createRoot(document.getElementById('root')!).render(

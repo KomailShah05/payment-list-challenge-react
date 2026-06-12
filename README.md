@@ -66,7 +66,23 @@ npm run test:all
 | 7 | Combined search + currency filter |
 | 8 | Pagination — Previous / Next, configurable page size (5 / 10 / 25 / 50) |
 
-**Beyond the brief**: URL sync (filters survive reload/share), WCAG AAA colour contrast, skip-to-content link, React Profiler observability hook, Axios token-bucket rate limiting + input sanitisation, skeleton loaders, percentage progress bar.
+**Beyond the brief**: URL sync (filters survive reload/share), WCAG AAA colour contrast, skip-to-content link, frontend observability (below), Axios token-bucket rate limiting + input sanitisation, skeleton loaders, percentage progress bar.
+
+---
+
+## Observability
+
+All signals flow through a single telemetry core (`src/observability/telemetry.ts`) — buffered in memory, logged in dev, silent in tests, and forwarded to a pluggable transport (Sentry / Datadog / `sendBeacon`) in production via `setTransport()`. Inspect live events in the browser console with `window.__telemetry.events()`.
+
+| Signal | What's captured |
+|--------|-----------------|
+| User interactions | `search_performed` (query *length* only — PII-safe), `currency_filter_changed`, `pagination_changed`, `filters_cleared` |
+| Search analytics | `search_results` — result count + no-results rate per filter combination |
+| API performance | `payment_api_request` latency per request, with `X-Request-Id` correlation header |
+| React Query cache | Cache hit rate, fetch durations, query failures (`src/observability/queryObservability.ts`) |
+| Render performance | React Profiler — every slow render (>16ms) recorded with component + phase |
+| Core Web Vitals | LCP / CLS / INP via `web-vitals` (`src/observability/webVitals.ts`) |
+| Errors | Structured events from the ErrorBoundary (`react_render_error`) and API layer (`payment_fetch_failed` with status code + filter context; cancelled requests excluded) |
 
 ---
 

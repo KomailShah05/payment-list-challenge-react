@@ -2,6 +2,7 @@ import { I18N } from "./constants/i18n";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PaymentsPage } from "./pages/PaymentsPage";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { initQueryObservability } from "./observability/queryObservability";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -10,6 +11,9 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Cache hit rate, fetch durations and query failures → telemetry
+initQueryObservability(queryClient);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

@@ -15,7 +15,7 @@ export const I18N = {
   PAGE_TITLE: "All payments",
 
   // Search & filter labels
-  SEARCH_PLACEHOLDER: "Enter payment ID",
+  SEARCH_PLACEHOLDER: "Search by ID, customer, currency, status…",
   SEARCH_LABEL: "Search payments",
   CURRENCY_FILTER_LABEL: "Filter by currency",
   CURRENCIES_OPTION: "Currencies",

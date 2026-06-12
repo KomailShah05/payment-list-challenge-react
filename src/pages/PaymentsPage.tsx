@@ -7,7 +7,7 @@ import {
   startTransition,
   Profiler,
 } from "react";
-import { I18N, PageSizeOption } from "../constants";
+import { I18N, PageSizeOption, CURRENCIES } from "../constants";
 import usePaymentFilters from "../hooks/usePaymentFilters";
 import usePayments from "../hooks/usePayments";
 import useLoadingProgress from "../hooks/useLoadingProgress";
@@ -52,6 +52,23 @@ export const PaymentsPage = () => {
       errorRef.current.focus();
     }
   }, [error]);
+
+  const handleSearch = useCallback(
+    (value: string) => {
+      const upper = value.trim().toUpperCase() as typeof CURRENCIES[number];
+      if ((CURRENCIES as readonly string[]).includes(upper)) {
+        actions.setInputValue("");
+        actions.commitSearch("");
+        startTransition(() => {
+          setOptimisticCurrency(upper);
+          actions.setCurrency(upper);
+        });
+      } else {
+        actions.commitSearch(value);
+      }
+    },
+    [actions, setOptimisticCurrency]
+  );
 
   const handleCurrencyChange = useCallback(
     (currency: string) => {
@@ -101,7 +118,7 @@ export const PaymentsPage = () => {
             pageSize={filters.pageSize}
             hasActiveFilters={hasActiveFilters}
             onInputChange={actions.setInputValue}
-            onSearch={actions.commitSearch}
+            onSearch={handleSearch}
             onCurrencyChange={handleCurrencyChange}
             onPageSizeChange={handlePageSizeChange}
             onClear={actions.clearFilters}

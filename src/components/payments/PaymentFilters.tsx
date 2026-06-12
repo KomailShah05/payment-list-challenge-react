@@ -64,6 +64,7 @@ const PaymentFilters = memo(({
       {/* Currency filter */}
       <div className="sm:w-36">
         <Select
+          key={currency}
           id="currency-select"
           label={I18N.CURRENCY_FILTER_LABEL}
           aria-label={I18N.CURRENCY_FILTER_LABEL}

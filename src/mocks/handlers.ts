@@ -42,7 +42,8 @@ export const handlers = [
         !search ||
         pay.id.toLowerCase().includes(search) ||
         pay.status?.toLowerCase().includes(search) ||
-        pay.currency?.toLowerCase().includes(search);
+        pay.currency?.toLowerCase().includes(search) ||
+        pay.customerName?.toLowerCase().includes(search);
       const matchesCurrency = !currency || pay.currency === currency;
       return matchesSearch && matchesCurrency;
     });

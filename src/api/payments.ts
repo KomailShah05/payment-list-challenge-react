@@ -6,7 +6,7 @@ import { logError, trackTiming } from "../observability/telemetry";
 
 export const fetchPayments = async (
   params: PaymentSearchParams,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<PaymentSearchResponse> => {
   const startedAt = performance.now();
   // Metadata only — never log the raw search string (may contain PII)
@@ -22,10 +22,12 @@ export const fetchPayments = async (
     // and ensures cache keys are canonical (undefined === omitted).
     const { data } = await apiClient.get<PaymentSearchResponse>(API_URL, {
       params: {
-        ...(params.search   ? { search:   params.search   } : {}),
+        ...(params.search ? { search: params.search } : {}),
         ...(params.currency ? { currency: params.currency } : {}),
-        page:     params.page     ?? 1,
+        page: params.page ?? 1,
         pageSize: params.pageSize ?? 5,
+        sortBy: params.sortBy ?? "date",
+        sortDir: params.sortDir ?? "desc",
       },
       signal,
     });
@@ -41,7 +43,8 @@ export const fetchPayments = async (
       logError("payment_fetch_failed", {
         ...requestMeta,
         durationMs: Math.round(performance.now() - startedAt),
-        statusCode: (error as { response?: { status?: number } })?.response?.status,
+        statusCode: (error as { response?: { status?: number } })?.response
+          ?.status,
       });
     }
     throw error;

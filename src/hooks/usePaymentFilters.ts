@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
-import { PaymentFilters, PaymentFiltersActions } from "../types";
-import { DEFAULT_PAGE_SIZE, INITIAL_FILTERS, PAGE_SIZE_OPTIONS } from "../constants";
+import { PaymentFilters, PaymentFiltersActions, SortField } from "../types";
+import {
+  DEFAULT_PAGE_SIZE,
+  INITIAL_FILTERS,
+  PAGE_SIZE_OPTIONS,
+  SORT_FIELDS,
+} from "../constants";
 import type { PageSizeOption } from "../constants";
 
-// navigator.userAgent includes "jsdom" in the Vitest jsdom environment
 const isBrowser =
   typeof window !== "undefined" &&
   typeof window.history?.replaceState === "function" &&
@@ -15,12 +19,29 @@ const readFromUrl = (): PaymentFilters => {
   const search = params.get("search") ?? "";
   const currency = params.get("currency") ?? "";
   const page = Math.max(1, parseInt(params.get("page") ?? "1", 10) || 1);
-  const rawSize = parseInt(params.get("pageSize") ?? String(DEFAULT_PAGE_SIZE), 10);
+  const rawSize = parseInt(
+    params.get("pageSize") ?? String(DEFAULT_PAGE_SIZE),
+    10,
+  );
   const pageSize = (PAGE_SIZE_OPTIONS as readonly number[]).includes(rawSize)
     ? (rawSize as PageSizeOption)
     : DEFAULT_PAGE_SIZE;
+  const rawSort = params.get("sortBy") ?? "";
+  const sortBy = SORT_FIELDS.includes(rawSort as SortField)
+    ? (rawSort as SortField)
+    : INITIAL_FILTERS.sortBy;
+  const sortDir =
+    params.get("sortDir") === "asc" ? "asc" : INITIAL_FILTERS.sortDir;
 
-  return { inputValue: search, committedSearch: search, currency, page, pageSize };
+  return {
+    inputValue: search,
+    committedSearch: search,
+    currency,
+    page,
+    pageSize,
+    sortBy,
+    sortDir,
+  };
 };
 
 const syncToUrl = (filters: PaymentFilters) => {
@@ -29,9 +50,22 @@ const syncToUrl = (filters: PaymentFilters) => {
   if (filters.committedSearch) params.set("search", filters.committedSearch);
   if (filters.currency) params.set("currency", filters.currency);
   if (filters.page > 1) params.set("page", String(filters.page));
-  if (filters.pageSize !== DEFAULT_PAGE_SIZE) params.set("pageSize", String(filters.pageSize));
+  if (filters.pageSize !== DEFAULT_PAGE_SIZE)
+    params.set("pageSize", String(filters.pageSize));
+
+  const sortChanged =
+    filters.sortBy !== INITIAL_FILTERS.sortBy ||
+    filters.sortDir !== INITIAL_FILTERS.sortDir;
+  if (sortChanged) {
+    params.set("sortBy", filters.sortBy);
+    params.set("sortDir", filters.sortDir);
+  }
   const qs = params.toString();
-  window.history.replaceState(null, "", qs ? `?${qs}` : window.location.pathname);
+  window.history.replaceState(
+    null,
+    "",
+    qs ? `?${qs}` : window.location.pathname,
+  );
 };
 
 const usePaymentFilters = (): [PaymentFilters, PaymentFiltersActions] => {
@@ -62,11 +96,25 @@ const usePaymentFilters = (): [PaymentFilters, PaymentFiltersActions] => {
   }, []);
 
   const setPageSize = useCallback((pageSize: number) => {
-    setFilters((prev) => ({ ...prev, pageSize: pageSize as PageSizeOption, page: 1 }));
+    setFilters((prev) => ({
+      ...prev,
+      pageSize: pageSize as PageSizeOption,
+      page: 1,
+    }));
   }, []);
 
   const clearFilters = useCallback(() => {
-    setFilters(INITIAL_FILTERS);
+    setFilters((prev) => ({ ...INITIAL_FILTERS, pageSize: prev.pageSize }));
+  }, []);
+
+  // Toggle sort: clicking the same column flips direction; new column defaults to asc
+  const setSort = useCallback((field: SortField) => {
+    setFilters((prev) => ({
+      ...prev,
+      sortBy: field,
+      sortDir: prev.sortBy === field && prev.sortDir === "asc" ? "desc" : "asc",
+      page: 1,
+    }));
   }, []);
 
   const actions: PaymentFiltersActions = {
@@ -75,6 +123,7 @@ const usePaymentFilters = (): [PaymentFilters, PaymentFiltersActions] => {
     setCurrency,
     setPage,
     setPageSize,
+    setSort,
     clearFilters,
   };
 

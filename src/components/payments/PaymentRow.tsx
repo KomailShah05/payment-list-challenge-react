@@ -23,7 +23,7 @@ const PaymentRow = memo(({ payment, index = 0 }: PaymentRowProps) => {
   return (
     <tr
       className="border-b border-gray-100 hover:bg-slate-50 transition-colors duration-150 animate-fade-slide-in"
-      style={{ animationDelay: `${index * 30}ms` }}
+      style={{ animationDelay: `${Math.min(index, 8) * 20}ms` }}
     >
       <td className="px-4 py-3 text-sm font-mono text-gray-900">{payment.id}</td>
       <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{formattedDate}</td>

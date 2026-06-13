@@ -26,6 +26,8 @@ export const handlers = [
     const currency = url.searchParams.get("currency")                 ?? "";
     const page     = parseInt(url.searchParams.get("page")     ?? "1",  10);
     const pageSize = parseInt(url.searchParams.get("pageSize") ?? "10", 10);
+    const sortBy   = url.searchParams.get("sortBy")  ?? "date";
+    const sortDir  = url.searchParams.get("sortDir") ?? "desc";
 
     if (search === "pay_404") {
       return HttpResponse.json({ message: "Payment not found" }, { status: 404 });
@@ -52,10 +54,22 @@ export const handlers = [
       return HttpResponse.json({ message: "Payment not found" }, { status: 404 });
     }
 
-    const total  = filtered.length;
+    const dir = sortDir === "asc" ? 1 : -1;
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case "amount":      return (a.amount - b.amount) * dir;
+        case "id":          return a.id.localeCompare(b.id) * dir;
+        case "customerName": return (a.customerName ?? "").localeCompare(b.customerName ?? "") * dir;
+        case "currency":    return a.currency.localeCompare(b.currency) * dir;
+        case "status":      return a.status.localeCompare(b.status) * dir;
+        default:            return (new Date(a.date).getTime() - new Date(b.date).getTime()) * dir;
+      }
+    });
+
+    const total  = sorted.length;
     const start  = (page - 1) * pageSize;
     const payload: PaymentSearchResponse = {
-      payments: filtered.slice(start, start + pageSize),
+      payments: sorted.slice(start, start + pageSize),
       total,
       page,
       pageSize,

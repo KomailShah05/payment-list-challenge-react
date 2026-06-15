@@ -7,7 +7,11 @@ import { initQueryObservability } from "./observability/queryObservability";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: false,
+      // Retry once after 600ms — covers the Service Worker wake-up window
+      // after the tab has been idle. Without this, the first request after
+      // coming back from idle fails immediately before MSW finishes activating.
+      retry: 1,
+      retryDelay: 600,
       // Keep cache alive for 30 min so returning to the tab after a break
       // doesn't discard previously loaded data.
       gcTime: 30 * 60 * 1000,

@@ -11,7 +11,16 @@ async function enableMocking() {
 
   try {
     const { worker } = await import('./mocks/browser');
-    await worker.start({ onUnhandledRequest: 'bypass' });
+    await worker.start({
+      onUnhandledRequest: 'bypass',
+      serviceWorker: {
+        options: {
+          // Always fetch the latest SW script, bypassing the HTTP cache.
+          // Prevents the "wrong version" warning after MSW upgrades.
+          updateViaCache: 'none',
+        },
+      },
+    });
     console.log('Mock Service Worker started');
   } catch (error) {
     console.error('Failed to start Mock Service Worker:', error);

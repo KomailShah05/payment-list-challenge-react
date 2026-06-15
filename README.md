@@ -77,18 +77,16 @@ npm run test:all
 | 7    | Combined search + currency filter                                                 |
 | 8    | Pagination — Previous / Next, configurable page size (5 / 10 / 25 / 50)           |
 
-## Accessibility
+### Accessibility
 
-The application is fully accessible and has been designed and tested against WCAG 2.1 AA/AAA standards. Accessibility features include:
-
-Keyboard-only navigation across all functionality
-Screen reader support with semantic HTML and ARIA attributes
-Focus management for error states and dynamic content updates
-Skip-to-content navigation link
-Screen-reader announcements for loading, success, and error states
-WCAG AAA colour contrast compliance
-Automated accessibility testing using Playwright and axe-core
-49 end-to-end tests including accessibility validation
+- Fully accessible and tested against WCAG 2.1 AA/AAA standards
+- Keyboard-only navigation support
+- Semantic HTML and ARIA attributes for screen readers
+- Focus management for errors and dynamic content updates
+- Skip-to-content navigation link
+- Accessible status and error announcements
+- WCAG AAA colour contrast compliance
+- Automated accessibility audits using Playwright and axe-core
 
 **Beyond the brief**: Column sorting (Date, Amount — amount sorting enabled only when a currency filter is active), URL state sync (filters survive reload/share), WCAG AAA colour contrast, skip-to-content link, frontend observability (see below), Axios token-bucket rate limiting + input sanitisation, skeleton loaders, percentage progress bar.
 

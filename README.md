@@ -19,6 +19,10 @@ A payment search interface built with React 19, TypeScript, and Tailwind CSS.
 
 ---
 
+## Demo Link
+
+https://www.loom.com/share/0b7b4e14407e4eb8a9e88ff01b8b041e
+
 ## Quick Start
 
 ```bash

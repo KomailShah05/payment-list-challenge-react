@@ -31,6 +31,10 @@ npm run dev          # http://localhost:3000
 ## Running Tests
 
 ```bash
+
+# Install playwright package
+npx playwright install
+
 # Unit tests
 npm test
 

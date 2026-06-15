@@ -10,7 +10,7 @@ import {
 } from "vitest";
 import { server } from "./mocks/node";
 import App from "./App";
-import { I18N } from "./constants/i18n";
+import { I18N } from "./constants";
 import { format } from 'date-fns';
 
 // Helper function to robustly check for error messages with better debugging

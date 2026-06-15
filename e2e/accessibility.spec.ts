@@ -9,10 +9,21 @@ const analyze = (page: Page) =>
     .exclude("[aria-hidden='true']")
     .analyze();
 
+// Wait for the table to exist AND for any in-flight fetch to complete.
+// aria-busy="false" means isLoading and isFetching are both false.
 const waitForTable = (page: Page) =>
-  page.waitForSelector("[data-testid='payments-table']", { timeout: 10_000 });
+  page.waitForSelector("[data-testid='payments-table'][aria-busy='false']", {
+    timeout: 10_000,
+  });
 
 test.describe("Accessibility — WCAG 2.1 AA/AAA", () => {
+  // Collapse all CSS animations to 0.01 ms so axe never scans mid-animation.
+  // Without this, fadeSlideIn rows start at opacity:0 and axe computes blended
+  // colours that fail the contrast check.
+  test.beforeEach(async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+  });
+
   test("initial page load has no violations", async ({ page }) => {
     await page.goto("/");
     await waitForTable(page);

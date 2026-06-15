@@ -42,9 +42,9 @@ test.describe("Payment list — workflow", () => {
       await expect(dataRows(page)).toHaveCount(5);
     });
 
-    test("amounts are currency-formatted", async ({ page }) => {
+    test("amounts are formatted as decimal numbers", async ({ page }) => {
       const firstAmount = dataRows(page).first().locator("td").nth(2);
-      await expect(firstAmount).toContainText(/[$£€¥]/);
+      await expect(firstAmount).toContainText(/^\d[\d,]*\.\d{2}$/);
     });
 
     test("dates are formatted as dd/MM/yyyy, HH:mm:ss", async ({ page }) => {
@@ -88,10 +88,11 @@ test.describe("Payment list — workflow", () => {
   // Step 3 ──────────────────────────────────────────────────────────────────
   test.describe("Step 3: clear filters", () => {
     test("Clear Filters button appears after a search", async ({ page }) => {
-      await expect(clearBtn(page)).not.toBeVisible();
+      // Button is always in the DOM (opacity toggle) — use aria-hidden to check active state
+      await expect(clearBtn(page)).toHaveAttribute("aria-hidden", "true");
       await searchInput(page).fill("pay_134_1");
       await searchBtn(page).click();
-      await expect(clearBtn(page)).toBeVisible();
+      await expect(clearBtn(page)).toHaveAttribute("aria-hidden", "false");
     });
 
     test("Clear Filters resets search input and reloads all results", async ({ page }) => {
@@ -151,7 +152,7 @@ test.describe("Payment list — workflow", () => {
 
     test("Clear Filters also resets the currency dropdown", async ({ page }) => {
       await currencySelect(page).selectOption("EUR");
-      await expect(clearBtn(page)).toBeVisible();
+      await expect(clearBtn(page)).toHaveAttribute("aria-hidden", "false");
       await clearBtn(page).click();
       await expect(currencySelect(page)).toHaveValue("");
     });

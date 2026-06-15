@@ -1,5 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from "react";
 import { I18N } from "../constants";
+import { logError } from "../observability/telemetry";
 
 interface Props {
   children: ReactNode;
@@ -19,7 +20,11 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    // In production this would ship to an observability service (e.g. Sentry)
+    // Structured error event — ships to the configured transport in prod
+    logError("react_render_error", {
+      message: error.message,
+      componentStack: info.componentStack?.split("\n").slice(0, 5).join("\n"),
+    });
     if (import.meta.env.DEV) {
       console.error("[ErrorBoundary]", error, info.componentStack);
     }

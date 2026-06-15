@@ -11,12 +11,6 @@ export interface Payment {
   clientId?: string;
 }
 
-export interface PaymentSearchParams {
-  search?: string;
-  currency?: string;
-  page?: number;
-  pageSize?: number;
-}
 
 export interface PaymentSearchResponse {
   payments: Payment[];
@@ -25,6 +19,10 @@ export interface PaymentSearchResponse {
   pageSize: number;
 }
 
+// ── Sorting ───────────────────────────────────────────────────────────────────
+export type SortField = "id" | "date" | "amount" | "customerName" | "currency" | "status";
+export type SortDirection = "asc" | "desc";
+
 // ── Filters ───────────────────────────────────────────────────────────────────
 export interface PaymentFilters {
   inputValue: string;
@@ -32,6 +30,8 @@ export interface PaymentFilters {
   currency: string;
   page: number;
   pageSize: number;
+  sortBy: SortField;
+  sortDir: SortDirection;
 }
 
 export interface PaymentFiltersActions {
@@ -40,5 +40,15 @@ export interface PaymentFiltersActions {
   setCurrency: (currency: string) => void;
   setPage: (page: number) => void;
   setPageSize: (pageSize: number) => void;
+  setSort: (field: SortField) => void;
   clearFilters: () => void;
+}
+
+export interface PaymentSearchParams {
+  search?: string;
+  currency?: string;
+  page?: number;
+  pageSize?: number;
+  sortBy?: SortField;
+  sortDir?: SortDirection;
 }

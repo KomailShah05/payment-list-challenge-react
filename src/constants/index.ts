@@ -1,11 +1,18 @@
-import type { PaymentFilters } from "../types";
+import type { PaymentFilters, SortField } from "../types";
 
 // ── API ───────────────────────────────────────────────────────────────────────
 export const API_URL = "/api/payments";
 
 // ── Currencies ────────────────────────────────────────────────────────────────
 export const CURRENCIES = [
-  "USD", "EUR", "GBP", "AUD", "CAD", "ZAR", "JPY", "CZK",
+  "USD",
+  "EUR",
+  "GBP",
+  "AUD",
+  "CAD",
+  "ZAR",
+  "JPY",
+  "CZK",
 ] as const;
 
 // ── i18n ──────────────────────────────────────────────────────────────────────
@@ -16,7 +23,7 @@ export const I18N = {
 
   // Search & filter labels
   SEARCH_PLACEHOLDER: "Search by ID, customer, currency, status…",
-  SEARCH_LABEL: "Search payments",
+  SEARCH_LABEL: "Search by ID, customer, currency, or status",
   CURRENCY_FILTER_LABEL: "Filter by currency",
   CURRENCIES_OPTION: "Currencies",
   PAGE_SIZE_LABEL: "Show:",
@@ -60,13 +67,28 @@ export const PAGE_SIZE_OPTIONS = [5, 10, 25, 50] as const;
 export type PageSizeOption = (typeof PAGE_SIZE_OPTIONS)[number];
 
 export const PAYMENT_TABLE_COLUMNS = [
-  { key: "id",       label: I18N.TABLE_HEADER_PAYMENT_ID },
-  { key: "date",     label: I18N.TABLE_HEADER_DATE },
-  { key: "amount",   label: I18N.TABLE_HEADER_AMOUNT },
+  { key: "id", label: I18N.TABLE_HEADER_PAYMENT_ID },
+  { key: "date", label: I18N.TABLE_HEADER_DATE },
+  { key: "amount", label: I18N.TABLE_HEADER_AMOUNT },
   { key: "customer", label: I18N.TABLE_HEADER_CUSTOMER },
   { key: "currency", label: I18N.TABLE_HEADER_CURRENCY },
-  { key: "status",   label: I18N.TABLE_HEADER_STATUS },
+  { key: "status", label: I18N.TABLE_HEADER_STATUS },
 ] as const;
+
+// ── Sorting ───────────────────────────────────────────────────────────────────
+export const SORT_FIELDS: readonly SortField[] = [
+  "id",
+  "date",
+  "amount",
+  "customerName",
+  "currency",
+  "status",
+];
+
+export const SORTABLE_COLUMNS: Partial<Record<string, SortField>> = {
+  date: "date",
+  amount: "amount",
+};
 
 // ── Filters ───────────────────────────────────────────────────────────────────
 export const INITIAL_FILTERS: PaymentFilters = {
@@ -75,4 +97,6 @@ export const INITIAL_FILTERS: PaymentFilters = {
   currency: "",
   page: 1,
   pageSize: DEFAULT_PAGE_SIZE,
+  sortBy: "date",
+  sortDir: "desc",
 };

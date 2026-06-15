@@ -1,33 +1,153 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="11" failures="0" errors="0" time="0.254482375">
-    <testsuite name="src/App.test.tsx" timestamp="2026-06-12T18:27:45.451Z" hostname="Mac.powerhub" tests="11" failures="0" errors="0" skipped="0" time="0.254482375">
-        <testcase classname="src/App.test.tsx" name="App - Step 1: Basic Payment List &gt; should fetch and display payments in a table with page=1 and pageSize=5" time="0.104960375">
+<testsuites name="vitest tests" tests="46" failures="0" errors="0" time="0.145545292">
+    <testsuite name="src/App.test.tsx" timestamp="2026-06-15T12:15:15.934Z" hostname="Mac.powerhub" tests="11" failures="0" errors="0" skipped="9" time="0.145545292">
+        <testcase classname="src/App.test.tsx" name="App - Step 1: Basic Payment List &gt; should fetch and display payments in a table with page=1 and pageSize=5" time="0">
+            <skipped/>
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 2: Search by Payment ID &gt; should have a search input for payment ID" time="0.0065755">
+        <testcase classname="src/App.test.tsx" name="App - Step 2: Search by Payment ID &gt; should have a search input for payment ID" time="0">
+            <skipped/>
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 2: Search by Payment ID &gt; should search for payments by payment ID" time="0.029693292">
+        <testcase classname="src/App.test.tsx" name="App - Step 2: Search by Payment ID &gt; should search for payments by payment ID" time="0">
+            <skipped/>
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 3: Clear Filters &gt; should clear all filters when clear button is clicked" time="0.016728417">
-            <system-err>
-A component suspended inside an `act` scope, but the `act` call was not awaited. When testing React components that depend on asynchronous data, you must await the result:
-
-await act(() =&gt; ...)
-
-            </system-err>
+        <testcase classname="src/App.test.tsx" name="App - Step 3: Clear Filters &gt; should clear all filters when clear button is clicked" time="0">
+            <skipped/>
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 4: Handle Payment Not Found &gt; should display error message when payment ID is not found" time="0.023219083">
+        <testcase classname="src/App.test.tsx" name="App - Step 4: Handle Payment Not Found &gt; should display error message when payment ID is not found" time="0">
+            <skipped/>
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 5: Handle Server Error &gt; should display error message when API returns 500" time="0.017170667">
+        <testcase classname="src/App.test.tsx" name="App - Step 5: Handle Server Error &gt; should display error message when API returns 500" time="0">
+            <skipped/>
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 6: Currency Filter &gt; should have a currency filter dropdown" time="0.0057585">
+        <testcase classname="src/App.test.tsx" name="App - Step 6: Currency Filter &gt; should have a currency filter dropdown" time="0">
+            <skipped/>
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 6: Currency Filter &gt; should filter payments by currency when selected" time="0.010724541">
+        <testcase classname="src/App.test.tsx" name="App - Step 6: Currency Filter &gt; should filter payments by currency when selected" time="0">
+            <skipped/>
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 7: Combined Currency and Payment ID Filter &gt; should filter by both currency and payment ID" time="0.014222958">
+        <testcase classname="src/App.test.tsx" name="App - Step 7: Combined Currency and Payment ID Filter &gt; should filter by both currency and payment ID" time="0">
+            <skipped/>
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 8: Pagination &gt; should display pagination controls" time="0.012671375">
+        <testcase classname="src/App.test.tsx" name="App - Step 8: Pagination &gt; should display pagination controls" time="0.128569458">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 8: Pagination &gt; should disable previous button on first page" time="0.011122083">
+        <testcase classname="src/App.test.tsx" name="App - Step 8: Pagination &gt; should disable previous button on first page" time="0.015628291">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/regression.currency.test.tsx" timestamp="2026-06-15T12:15:15.936Z" hostname="Mac.powerhub" tests="2" failures="0" errors="0" skipped="2" time="0">
+        <testcase classname="src/regression.currency.test.tsx" name="Regression: clearing search must not reset currency &gt; X after committed search keeps currency in dropdown AND in query" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/regression.currency.test.tsx" name="Regression: clearing search must not reset currency &gt; X without committing search keeps currency" time="0">
+            <skipped/>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/ErrorBoundary.test.tsx" timestamp="2026-06-15T12:15:15.937Z" hostname="Mac.powerhub" tests="5" failures="0" errors="0" skipped="5" time="0">
+        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; renders children when there is no error" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; renders default fallback UI when a child throws" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; renders Try again button in the default fallback" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; renders custom fallback when provided" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; clicking Try again resets the error state when children no longer throw" time="0">
+            <skipped/>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/format.test.ts" timestamp="2026-06-15T12:15:15.937Z" hostname="Mac.powerhub" tests="6" failures="0" errors="0" skipped="6" time="0">
+        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; formats integer amounts with 2 decimal places" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; formats decimal amounts correctly" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; formats large amounts with thousands separator" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; formats zero correctly" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; rounds to 2 decimal places" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/format.test.ts" name="formatDate &gt; formats ISO date string into dd/MM/yyyy, HH:mm:ss" time="0">
+            <skipped/>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/telemetry.test.ts" timestamp="2026-06-15T12:15:15.938Z" hostname="Mac.powerhub" tests="7" failures="0" errors="0" skipped="7" time="0">
+        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; trackEvent adds an info-level event to the buffer" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; trackTiming adds a timing-level event with rounded durationMs" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; logError adds an error-level event to the buffer" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; events include a sessionId and timestamp" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; getEvents returns a readonly snapshot of the buffer" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; setTransport calls the transport function with emitted events" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; events without metadata omit the metadata key" time="0">
+            <skipped/>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/useObservability.test.ts" timestamp="2026-06-15T12:15:15.939Z" hostname="Mac.powerhub" tests="5" failures="0" errors="0" skipped="5" time="0">
+        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; returns the telemetry helpers and onRenderCallback" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; onRenderCallback does NOT emit a slow_render event when under threshold" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; onRenderCallback emits a slow_render timing event when over threshold" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; uses default 16ms threshold when no config given" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; trackEvent and logError are the same references as telemetry exports" time="0">
+            <skipped/>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/usePaymentFilters.test.ts" timestamp="2026-06-15T12:15:15.939Z" hostname="Mac.powerhub" tests="10" failures="0" errors="0" skipped="10" time="0">
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; initialises with INITIAL_FILTERS defaults" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setInputValue updates inputValue without committing search" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; commitSearch commits trimmed inputValue and resets page to 1" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setCurrency updates currency and resets page to 1" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setPage updates page" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setPageSize updates pageSize and resets page to 1" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; clearFilters resets everything but preserves pageSize" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setSort on a new field defaults to asc" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setSort on the same field with asc toggles to desc" time="0">
+            <skipped/>
+        </testcase>
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setSort resets page to 1" time="0">
+            <skipped/>
         </testcase>
     </testsuite>
 </testsuites>

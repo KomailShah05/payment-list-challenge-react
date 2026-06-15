@@ -17,6 +17,7 @@ import ProgressBar from "../components/ui/ProgressBar";
 import PaymentFilters from "../components/payments/PaymentFilters";
 import PaymentTable from "../components/payments/PaymentTable";
 import Pagination from "../components/payments/Pagination";
+import { SortField } from "../types";
 
 const getErrorMessage = (err: unknown): string => {
   const status = (err as { response?: { status?: number } })?.response?.status;
@@ -28,81 +29,181 @@ const getErrorMessage = (err: unknown): string => {
 
 export const PaymentsPage = () => {
   const [filters, actions] = usePaymentFilters();
-  const { onRenderCallback } = useObservability({ warnThresholdMs: 16 });
+  const { onRenderCallback, trackEvent, logError } = useObservability({
+    // 50ms: below this React dev-mode overhead and 50-row mounts cause false positives.
+    // Users notice jank at ~50ms+ (3 dropped frames at 60fps), so this is the
+    // meaningful signal threshold.
+    warnThresholdMs: 50,
+  });
 
   const deferredInput = useDeferredValue(filters.inputValue);
-  const [optimisticCurrency, setOptimisticCurrency] = useOptimistic(filters.currency);
+  const [optimisticCurrency, setOptimisticCurrency] = useOptimistic(
+    filters.currency,
+  );
 
-  // Memoised so the object reference only changes when values actually change.
-  // Without this, useEffect inside usePayments fires on every render because
-  // a new object is created each time — causing redundant prefetch calls.
-  const queryParams = useMemo(() => ({
-    search:   filters.committedSearch || undefined,
-    currency: optimisticCurrency      || undefined,
-    page:     filters.page,
-    pageSize: filters.pageSize,
-  }), [filters.committedSearch, optimisticCurrency, filters.page, filters.pageSize]);
+  const queryParams = useMemo(
+    () => ({
+      search: filters.committedSearch || undefined,
+      currency: optimisticCurrency || undefined,
+      page: filters.page,
+      pageSize: filters.pageSize,
+      sortBy: filters.sortBy,
+      sortDir: filters.sortDir,
+    }),
+    [
+      filters.committedSearch,
+      optimisticCurrency,
+      filters.page,
+      filters.pageSize,
+      filters.sortBy,
+      filters.sortDir,
+    ],
+  );
 
   const { data, isFetching, isLoading, error } = usePayments(queryParams);
   const progress = useLoadingProgress(isFetching);
 
-  const totalPages       = data ? Math.ceil(data.total / filters.pageSize) : 1;
-  const hasActiveFilters = filters.committedSearch !== "" || optimisticCurrency !== "";
+  const totalPages = data ? Math.ceil(data.total / filters.pageSize) : 1;
+
+  // Redirect out-of-bounds page to the last valid page
+  useEffect(() => {
+    if (data && filters.page > totalPages && totalPages > 0) {
+      actions.setPage(totalPages);
+    }
+  }, [data, filters.page, totalPages, actions]);
+
+  // If currency filter is cleared while sorting by amount, fall back to date sort
+  useEffect(() => {
+    if (!optimisticCurrency && filters.sortBy === "amount") {
+      actions.setSort("date");
+    }
+  }, [optimisticCurrency, filters.sortBy, actions]);
+
+  // Only count COMMITTED filters, not text currently being typed
+  const hasActiveFilters =
+    filters.committedSearch !== "" || optimisticCurrency !== "";
 
   // Focus the error box when it first appears so screen readers announce it
   const errorRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (error && errorRef.current) {
       errorRef.current.focus();
+      logError("payment_list_error_shown", {
+        statusCode: (error as { response?: { status?: number } })?.response
+          ?.status,
+        hasSearch: filters.committedSearch !== "",
+        currency: filters.currency || undefined,
+        page: filters.page,
+      });
     }
-  }, [error]);
+  }, [
+    error,
+    logError,
+    filters.committedSearch,
+    filters.currency,
+    filters.page,
+  ]);
+
+  // Track result counts whenever a filter is active — query string length only (PII-safe)
+  useEffect(() => {
+    if (!data || !hasActiveFilters) return;
+    trackEvent("search_results", {
+      resultCount: data.total,
+      noResults: data.total === 0,
+      queryLength: filters.committedSearch.length,
+      currency: filters.currency || undefined,
+    });
+  }, [
+    data,
+    hasActiveFilters,
+    trackEvent,
+    filters.committedSearch,
+    filters.currency,
+  ]);
 
   const handleSearch = useCallback(
     (value: string) => {
-      const upper = value.trim().toUpperCase() as typeof CURRENCIES[number];
-      if ((CURRENCIES as readonly string[]).includes(upper)) {
+      const upper = value.trim().toUpperCase() as (typeof CURRENCIES)[number];
+      const isCurrencyShortcut = (CURRENCIES as readonly string[]).includes(
+        upper,
+      );
+      trackEvent("search_performed", {
+        queryLength: value.trim().length,
+        isCurrencyShortcut,
+      });
+      if (isCurrencyShortcut) {
         actions.setInputValue("");
         actions.commitSearch("");
-        actions.setCurrency(upper);  // urgent — commits filters.currency immediately
-        startTransition(() => {
-          setOptimisticCurrency(upper);
-        });
+        actions.setCurrency(upper);
+        startTransition(() => setOptimisticCurrency(upper));
       } else {
         actions.commitSearch(value);
       }
     },
-    [actions, setOptimisticCurrency]
+    [actions, setOptimisticCurrency, trackEvent],
   );
 
   const handleCurrencyChange = useCallback(
     (currency: string) => {
-      // Commit the real state urgently so filters.currency is always up-to-date
-      // during any concurrent render (e.g. the urgent re-render that fires when
-      // the user clears the search input). The optimistic update only needs to
-      // cover the brief moment before the state commit — so keep it in a
-      // transition but don't put setCurrency in there.
+      trackEvent("currency_filter_changed", { currency: currency || "all" });
       actions.setCurrency(currency);
-      startTransition(() => {
-        setOptimisticCurrency(currency);
-      });
+      startTransition(() => setOptimisticCurrency(currency));
     },
-    [actions, setOptimisticCurrency]
+    [actions, setOptimisticCurrency, trackEvent],
   );
 
   const handlePageSizeChange = useCallback(
-    (size: PageSizeOption) => actions.setPageSize(size),
-    [actions]
+    (size: PageSizeOption) => {
+      trackEvent("pagination_changed", { pageSize: size, page: 1 });
+      actions.setPageSize(size);
+    },
+    [actions, trackEvent],
   );
 
-  const handlePrevious = useCallback(
-    () => actions.setPage(filters.page - 1),
-    [actions, filters.page]
+  const handlePrevious = useCallback(() => {
+    trackEvent("pagination_changed", {
+      page: filters.page - 1,
+      direction: "previous",
+    });
+    actions.setPage(filters.page - 1);
+  }, [actions, filters.page, trackEvent]);
+
+  const handleNext = useCallback(() => {
+    trackEvent("pagination_changed", {
+      page: filters.page + 1,
+      direction: "next",
+    });
+    actions.setPage(filters.page + 1);
+  }, [actions, filters.page, trackEvent]);
+
+  const handleClear = useCallback(() => {
+    trackEvent("filters_cleared", {
+      hadSearch: filters.committedSearch !== "",
+      hadCurrency: filters.currency !== "",
+    });
+    actions.clearFilters();
+  }, [actions, filters.committedSearch, filters.currency, trackEvent]);
+
+  const handleSort = useCallback(
+    (field: SortField) => {
+      const newDir =
+        filters.sortBy === field && filters.sortDir === "asc" ? "desc" : "asc";
+      trackEvent("sort_changed", { field, direction: newDir });
+      actions.setSort(field);
+    },
+    [actions, filters.sortBy, filters.sortDir, trackEvent],
   );
 
-  const handleNext = useCallback(
-    () => actions.setPage(filters.page + 1),
-    [actions, filters.page]
-  );
+  // "Showing X–Y of Z results"
+  const resultsLabel = useMemo(() => {
+    if (!data) return null;
+    if (data.total === 0) return "Showing 0 results";
+    const start = (filters.page - 1) * filters.pageSize + 1;
+    const end   = Math.min(filters.page * filters.pageSize, data.total);
+    return `Showing ${start}–${end} of ${data.total} result${data.total !== 1 ? "s" : ""}`;
+  }, [data, filters.page, filters.pageSize]);
+
+  const hasCurrencyFilter = optimisticCurrency !== "";
 
   return (
     <Profiler id="PaymentsPage" onRender={onRenderCallback}>
@@ -122,7 +223,11 @@ export const PaymentsPage = () => {
 
         <div className="mb-6">
           <PaymentFilters
-            inputValue={deferredInput !== filters.inputValue ? filters.inputValue : deferredInput}
+            inputValue={
+              deferredInput !== filters.inputValue
+                ? filters.inputValue
+                : deferredInput
+            }
             currency={optimisticCurrency}
             pageSize={filters.pageSize}
             hasActiveFilters={hasActiveFilters}
@@ -130,11 +235,10 @@ export const PaymentsPage = () => {
             onSearch={handleSearch}
             onCurrencyChange={handleCurrencyChange}
             onPageSizeChange={handlePageSizeChange}
-            onClear={actions.clearFilters}
+            onClear={handleClear}
           />
         </div>
 
-        {/* Error — focusable so keyboard/screen-reader users are immediately aware */}
         {error && (
           <div
             data-testid="error-message"
@@ -148,23 +252,27 @@ export const PaymentsPage = () => {
           </div>
         )}
 
-        {!error && !isLoading && !isFetching && data?.payments?.length === 0 && (
-          <div
-            role="status"
-            aria-live="polite"
-            className="rounded-md border border-gray-200 bg-gray-50 px-4 py-8 text-center text-sm font-medium text-gray-700"
-          >
-            {I18N.NO_PAYMENTS_FOUND}
-          </div>
-        )}
-
         {!error && (
           <section id="payments-table" aria-label={I18N.PAGE_TITLE}>
+            {resultsLabel && (
+              <p
+                data-testid="results-count"
+                aria-live="polite"
+                className="mb-2 text-sm text-gray-500"
+              >
+                {resultsLabel}
+              </p>
+            )}
+
             <PaymentTable
               payments={data?.payments ?? []}
               isLoading={isLoading}
               isFetching={isFetching}
               pageSize={filters.pageSize}
+              sortBy={filters.sortBy}
+              sortDir={filters.sortDir}
+              hasCurrencyFilter={hasCurrencyFilter}
+              onSort={handleSort}
             />
             <Pagination
               page={filters.page}

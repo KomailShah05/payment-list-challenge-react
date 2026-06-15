@@ -23,7 +23,7 @@ export const I18N = {
 
   // Search & filter labels
   SEARCH_PLACEHOLDER: "Search by ID, customer, currency, status…",
-  SEARCH_LABEL: "Search payments",
+  SEARCH_LABEL: "Search by ID, customer, currency, or status",
   CURRENCY_FILTER_LABEL: "Filter by currency",
   CURRENCIES_OPTION: "Currencies",
   PAGE_SIZE_LABEL: "Show:",

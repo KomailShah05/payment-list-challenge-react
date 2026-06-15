@@ -11,8 +11,8 @@ interface PaymentRowProps {
 
 const PaymentRow = memo(({ payment, index = 0 }: PaymentRowProps) => {
   const formattedAmount = useMemo(
-    () => formatAmount(payment.amount, payment.currency),
-    [payment.amount, payment.currency]
+    () => formatAmount(payment.amount),
+    [payment.amount]
   );
 
   const formattedDate = useMemo(

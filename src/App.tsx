@@ -1,4 +1,4 @@
-import { I18N } from "./constants/i18n";
+import { I18N } from "./constants";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PaymentsPage } from "./pages/PaymentsPage";
 import ErrorBoundary from "./components/ErrorBoundary";

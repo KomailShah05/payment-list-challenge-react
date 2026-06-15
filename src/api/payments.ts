@@ -38,8 +38,16 @@ export const fetchPayments = async (
     });
     return data;
   } catch (error) {
-    // Cancelled requests (rapid filter changes) are expected — not errors
-    if (!axios.isCancel(error)) {
+    // Treat as expected cancellation if:
+    //   • axios cancelled the request (axios.isCancel)
+    //   • the AbortSignal was aborted by TanStack Query (signal?.aborted)
+    //   • TanStack Query threw its own CancelledError class (name check)
+    const isCancelled =
+      axios.isCancel(error) ||
+      signal?.aborted ||
+      (error instanceof Error && error.name === "CancelledError");
+
+    if (!isCancelled) {
       logError("payment_fetch_failed", {
         ...requestMeta,
         durationMs: Math.round(performance.now() - startedAt),

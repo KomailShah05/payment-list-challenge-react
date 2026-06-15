@@ -40,11 +40,20 @@ export const initQueryObservability = (queryClient: QueryClient): (() => void) =
         } else if (event.action.type === "error") {
           const start = fetchStartedAt.get(key);
           fetchStartedAt.delete(key);
-          logError("query_fetch_error", {
-            queryKey: query.queryKey,
-            durationMs: start !== undefined ? Math.round(performance.now() - start) : undefined,
-            message: (event.action.error as Error | undefined)?.message,
-          });
+          const err = event.action.error as Error | undefined;
+          // Ignore query cancellations — these are expected when filters change
+          // mid-flight and TanStack Query aborts the previous request.
+          const isCancelled =
+            err?.name === "CancelledError" ||
+            err?.message === "CancelledError" ||
+            err?.name === "AbortError";
+          if (!isCancelled) {
+            logError("query_fetch_error", {
+              queryKey: query.queryKey,
+              durationMs: start !== undefined ? Math.round(performance.now() - start) : undefined,
+              message: err?.message,
+            });
+          }
         }
         break;
     }

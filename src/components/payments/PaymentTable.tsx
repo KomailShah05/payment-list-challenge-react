@@ -12,6 +12,7 @@ interface PaymentTableProps {
   pageSize: number;
   sortBy: SortField;
   sortDir: SortDirection;
+  hasCurrencyFilter: boolean;
   onSort: (field: SortField) => void;
 }
 
@@ -23,6 +24,7 @@ const PaymentTable = memo(
     pageSize,
     sortBy,
     sortDir,
+    hasCurrencyFilter,
     onSort,
   }: PaymentTableProps) => (
     <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
@@ -37,7 +39,10 @@ const PaymentTable = memo(
         <thead className="border-b-2 border-gray-200 bg-gray-50">
           <tr>
             {PAYMENT_TABLE_COLUMNS.map(({ key, label }) => {
-              const sortField = SORTABLE_COLUMNS[key];
+              // Amount sorting only makes sense within a single currency
+              const sortField = key === "amount" && !hasCurrencyFilter
+                ? undefined
+                : SORTABLE_COLUMNS[key];
               const isActive = sortField === sortBy;
               return (
                 <th

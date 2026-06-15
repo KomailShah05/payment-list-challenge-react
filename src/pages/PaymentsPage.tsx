@@ -30,7 +30,10 @@ const getErrorMessage = (err: unknown): string => {
 export const PaymentsPage = () => {
   const [filters, actions] = usePaymentFilters();
   const { onRenderCallback, trackEvent, logError } = useObservability({
-    warnThresholdMs: 16,
+    // 50ms: below this React dev-mode overhead and 50-row mounts cause false positives.
+    // Users notice jank at ~50ms+ (3 dropped frames at 60fps), so this is the
+    // meaningful signal threshold.
+    warnThresholdMs: 50,
   });
 
   const deferredInput = useDeferredValue(filters.inputValue);
@@ -68,6 +71,13 @@ export const PaymentsPage = () => {
       actions.setPage(totalPages);
     }
   }, [data, filters.page, totalPages, actions]);
+
+  // If currency filter is cleared while sorting by amount, fall back to date sort
+  useEffect(() => {
+    if (!optimisticCurrency && filters.sortBy === "amount") {
+      actions.setSort("date");
+    }
+  }, [optimisticCurrency, filters.sortBy, actions]);
 
   // Only count COMMITTED filters, not text currently being typed
   const hasActiveFilters =
@@ -187,14 +197,13 @@ export const PaymentsPage = () => {
   // "Showing X–Y of Z results"
   const resultsLabel = useMemo(() => {
     if (!data) return null;
+    if (data.total === 0) return "Showing 0 results";
     const start = (filters.page - 1) * filters.pageSize + 1;
-    const end = Math.min(filters.page * filters.pageSize, data.total);
+    const end   = Math.min(filters.page * filters.pageSize, data.total);
     return `Showing ${start}–${end} of ${data.total} result${data.total !== 1 ? "s" : ""}`;
   }, [data, filters.page, filters.pageSize]);
 
-  //  warn when sorting by amount with mixed currencies
-  const showAmountSortWarning =
-    filters.sortBy === "amount" && !optimisticCurrency;
+  const hasCurrencyFilter = optimisticCurrency !== "";
 
   return (
     <Profiler id="PaymentsPage" onRender={onRenderCallback}>
@@ -245,23 +254,15 @@ export const PaymentsPage = () => {
 
         {!error && (
           <section id="payments-table" aria-label={I18N.PAGE_TITLE}>
-            <div className="mb-2 flex items-center justify-between gap-4">
-              {resultsLabel && (
-                <p
-                  data-testid="results-count"
-                  aria-live="polite"
-                  className="text-sm text-gray-500"
-                >
-                  {resultsLabel}
-                </p>
-              )}
-              {showAmountSortWarning && (
-                <p role="note" className="text-xs text-amber-600">
-                  Amounts compared by numeric value across currencies. Filter by
-                  currency for a fair sort.
-                </p>
-              )}
-            </div>
+            {resultsLabel && (
+              <p
+                data-testid="results-count"
+                aria-live="polite"
+                className="mb-2 text-sm text-gray-500"
+              >
+                {resultsLabel}
+              </p>
+            )}
 
             <PaymentTable
               payments={data?.payments ?? []}
@@ -270,6 +271,7 @@ export const PaymentsPage = () => {
               pageSize={filters.pageSize}
               sortBy={filters.sortBy}
               sortDir={filters.sortDir}
+              hasCurrencyFilter={hasCurrencyFilter}
               onSort={handleSort}
             />
             <Pagination

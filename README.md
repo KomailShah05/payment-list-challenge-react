@@ -34,6 +34,9 @@ npm run dev          # http://localhost:3000
 # Unit tests
 npm test
 
+# Unit tests with coverage report
+npm run test:coverage
+
 # Individual step
 npm run test:step1
 npm run test:step2

@@ -8,6 +8,12 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
+      // Keep cache alive for 30 min so returning to the tab after a break
+      // doesn't discard previously loaded data.
+      gcTime: 30 * 60 * 1000,
+      // Don't refetch just because the user switches tabs — data stays fresh
+      // for staleTime already; active navigation and search trigger new fetches.
+      refetchOnWindowFocus: false,
     },
   },
 });

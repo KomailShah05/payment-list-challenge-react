@@ -10,7 +10,7 @@ A payment search interface built with React 19, TypeScript, and Tailwind CSS.
 
 |                          |                                                        |
 | ------------------------ | ------------------------------------------------------ |
-| React 19                 | `useOptimistic`, `useActionState`, `useDeferredValue`  |
+| React 19                 | `useOptimistic`, `useDeferredValue`, React Profiler    |
 | TanStack Query v5        | Caching, pagination prefetch, stale-while-revalidate   |
 | MSW v2                   | API mocking — search by ID, customer, currency, status |
 | Vitest + Testing Library | 46 unit/component tests across all 8 steps             |

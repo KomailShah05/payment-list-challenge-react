@@ -1,4 +1,4 @@
-import { describe, test, expect, vi } from "vitest";
+import { describe, test, expect } from "vitest";
 import { renderHook } from "@testing-library/react";
 import useObservability from "../hooks/useObservability";
 import { getEvents } from "../observability/telemetry";
@@ -16,7 +16,7 @@ describe("useObservability", () => {
     const { result } = renderHook(() => useObservability({ warnThresholdMs: 50 }));
     const before = getEvents().length;
     // Simulate a fast render (5ms < 50ms threshold)
-    result.current.onRenderCallback("PaymentsPage", "mount", 5, 5, 0, 0, new Set());
+    result.current.onRenderCallback("PaymentsPage", "mount", 5, 5, 0, 0);
     expect(getEvents().length).toBe(before);
   });
 
@@ -24,7 +24,7 @@ describe("useObservability", () => {
     const { result } = renderHook(() => useObservability({ warnThresholdMs: 50 }));
     const before = getEvents().length;
     // Simulate a slow render (100ms > 50ms threshold)
-    result.current.onRenderCallback("PaymentsPage", "update", 100, 100, 0, 0, new Set());
+    result.current.onRenderCallback("PaymentsPage", "update", 100, 100, 0, 0);
     const events = getEvents();
     expect(events.length).toBe(before + 1);
     const latest = events[events.length - 1];
@@ -39,7 +39,7 @@ describe("useObservability", () => {
     const { result } = renderHook(() => useObservability());
     const before = getEvents().length;
     // 20ms > 16ms default threshold
-    result.current.onRenderCallback("TestId", "mount", 20, 20, 0, 0, new Set());
+    result.current.onRenderCallback("TestId", "mount", 20, 20, 0, 0);
     const events = getEvents();
     expect(events.length).toBe(before + 1);
     expect(events[events.length - 1].metadata?.thresholdMs).toBe(16);

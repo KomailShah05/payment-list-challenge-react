@@ -1,117 +1,117 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="46" failures="0" errors="0" time="0.550527792">
-    <testsuite name="src/App.test.tsx" timestamp="2026-06-15T21:52:14.584Z" hostname="Komails-MacBook-Air.local" tests="11" failures="0" errors="0" skipped="0" time="0.252702125">
-        <testcase classname="src/App.test.tsx" name="App - Step 1: Basic Payment List &gt; should fetch and display payments in a table with page=1 and pageSize=5" time="0.099461042">
+<testsuites name="vitest tests" tests="46" failures="0" errors="0" time="1.688382627">
+    <testsuite name="src/App.test.tsx" timestamp="2026-06-16T15:45:38.622Z" hostname="Mac.powerhub" tests="11" failures="0" errors="0" skipped="0" time="1.472837333">
+        <testcase classname="src/App.test.tsx" name="App - Step 1: Basic Payment List &gt; should fetch and display payments in a table with page=1 and pageSize=5" time="0.092818542">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 2: Search by Payment ID &gt; should have a search input for payment ID" time="0.007237625">
+        <testcase classname="src/App.test.tsx" name="App - Step 2: Search by Payment ID &gt; should have a search input for payment ID" time="0.007527833">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 2: Search by Payment ID &gt; should search for payments by payment ID" time="0.026485417">
+        <testcase classname="src/App.test.tsx" name="App - Step 2: Search by Payment ID &gt; should search for payments by payment ID" time="0.025543958">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 3: Clear Filters &gt; should clear all filters when clear button is clicked" time="0.017357083">
+        <testcase classname="src/App.test.tsx" name="App - Step 3: Clear Filters &gt; should clear all filters when clear button is clicked" time="0.016409208">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 4: Handle Payment Not Found &gt; should display error message when payment ID is not found" time="0.028588292">
+        <testcase classname="src/App.test.tsx" name="App - Step 4: Handle Payment Not Found &gt; should display error message when payment ID is not found" time="0.63165925">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 5: Handle Server Error &gt; should display error message when API returns 500" time="0.01629525">
+        <testcase classname="src/App.test.tsx" name="App - Step 5: Handle Server Error &gt; should display error message when API returns 500" time="0.63606075">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 6: Currency Filter &gt; should have a currency filter dropdown" time="0.005800208">
+        <testcase classname="src/App.test.tsx" name="App - Step 6: Currency Filter &gt; should have a currency filter dropdown" time="0.009875834">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 6: Currency Filter &gt; should filter payments by currency when selected" time="0.012316834">
+        <testcase classname="src/App.test.tsx" name="App - Step 6: Currency Filter &gt; should filter payments by currency when selected" time="0.013324792">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 7: Combined Currency and Payment ID Filter &gt; should filter by both currency and payment ID" time="0.012589667">
+        <testcase classname="src/App.test.tsx" name="App - Step 7: Combined Currency and Payment ID Filter &gt; should filter by both currency and payment ID" time="0.015246459">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 8: Pagination &gt; should display pagination controls" time="0.012220667">
+        <testcase classname="src/App.test.tsx" name="App - Step 8: Pagination &gt; should display pagination controls" time="0.0118585">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App - Step 8: Pagination &gt; should disable previous button on first page" time="0.012664958">
-        </testcase>
-    </testsuite>
-    <testsuite name="src/regression.currency.test.tsx" timestamp="2026-06-15T21:52:14.585Z" hostname="Komails-MacBook-Air.local" tests="2" failures="0" errors="0" skipped="0" time="0.109803541">
-        <testcase classname="src/regression.currency.test.tsx" name="Regression: clearing search must not reset currency &gt; X after committed search keeps currency in dropdown AND in query" time="0.08741525">
-        </testcase>
-        <testcase classname="src/regression.currency.test.tsx" name="Regression: clearing search must not reset currency &gt; X without committing search keeps currency" time="0.021622541">
+        <testcase classname="src/App.test.tsx" name="App - Step 8: Pagination &gt; should disable previous button on first page" time="0.010777833">
         </testcase>
     </testsuite>
-    <testsuite name="src/__tests__/ErrorBoundary.test.tsx" timestamp="2026-06-15T21:52:14.585Z" hostname="Komails-MacBook-Air.local" tests="5" failures="0" errors="0" skipped="0" time="0.082087333">
-        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; renders children when there is no error" time="0.020166083">
+    <testsuite name="src/regression.currency.test.tsx" timestamp="2026-06-16T15:45:38.623Z" hostname="Mac.powerhub" tests="2" failures="0" errors="0" skipped="0" time="0.102950292">
+        <testcase classname="src/regression.currency.test.tsx" name="Regression: clearing search must not reset currency &gt; X after committed search keeps currency in dropdown AND in query" time="0.084440709">
         </testcase>
-        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; renders default fallback UI when a child throws" time="0.0398795">
-        </testcase>
-        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; renders Try again button in the default fallback" time="0.009474667">
-        </testcase>
-        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; renders custom fallback when provided" time="0.001755083">
-        </testcase>
-        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; clicking Try again resets the error state when children no longer throw" time="0.010110333">
+        <testcase classname="src/regression.currency.test.tsx" name="Regression: clearing search must not reset currency &gt; X without committing search keeps currency" time="0.018024708">
         </testcase>
     </testsuite>
-    <testsuite name="src/__tests__/format.test.ts" timestamp="2026-06-15T21:52:14.586Z" hostname="Komails-MacBook-Air.local" tests="6" failures="0" errors="0" skipped="0" time="0.025344708">
-        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; formats integer amounts with 2 decimal places" time="0.023706584">
+    <testsuite name="src/__tests__/ErrorBoundary.test.tsx" timestamp="2026-06-16T15:45:38.623Z" hostname="Mac.powerhub" tests="5" failures="0" errors="0" skipped="0" time="0.064284709">
+        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; renders children when there is no error" time="0.017168292">
         </testcase>
-        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; formats decimal amounts correctly" time="0.000152333">
+        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; renders default fallback UI when a child throws" time="0.031158583">
         </testcase>
-        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; formats large amounts with thousands separator" time="0.000082209">
+        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; renders Try again button in the default fallback" time="0.008424">
         </testcase>
-        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; formats zero correctly" time="0.000065292">
+        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; renders custom fallback when provided" time="0.001044083">
         </testcase>
-        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; rounds to 2 decimal places" time="0.000062291">
-        </testcase>
-        <testcase classname="src/__tests__/format.test.ts" name="formatDate &gt; formats ISO date string into dd/MM/yyyy, HH:mm:ss" time="0.000733625">
+        <testcase classname="src/__tests__/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; clicking Try again resets the error state when children no longer throw" time="0.005834083">
         </testcase>
     </testsuite>
-    <testsuite name="src/__tests__/telemetry.test.ts" timestamp="2026-06-15T21:52:14.586Z" hostname="Komails-MacBook-Air.local" tests="7" failures="0" errors="0" skipped="0" time="0.007469292">
-        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; trackEvent adds an info-level event to the buffer" time="0.003795792">
+    <testsuite name="src/__tests__/format.test.ts" timestamp="2026-06-16T15:45:38.623Z" hostname="Mac.powerhub" tests="6" failures="0" errors="0" skipped="0" time="0.011435292">
+        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; formats integer amounts with 2 decimal places" time="0.0101505">
         </testcase>
-        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; trackTiming adds a timing-level event with rounded durationMs" time="0.000582917">
+        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; formats decimal amounts correctly" time="0.000122458">
         </testcase>
-        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; logError adds an error-level event to the buffer" time="0.000116333">
+        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; formats large amounts with thousands separator" time="0.000111625">
         </testcase>
-        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; events include a sessionId and timestamp" time="0.000206042">
+        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; formats zero correctly" time="0.000064584">
         </testcase>
-        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; getEvents returns a readonly snapshot of the buffer" time="0.0002485">
+        <testcase classname="src/__tests__/format.test.ts" name="formatAmount &gt; rounds to 2 decimal places" time="0.000059">
         </testcase>
-        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; setTransport calls the transport function with emitted events" time="0.000283667">
-        </testcase>
-        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; events without metadata omit the metadata key" time="0.000205584">
+        <testcase classname="src/__tests__/format.test.ts" name="formatDate &gt; formats ISO date string into dd/MM/yyyy, HH:mm:ss" time="0.000451125">
         </testcase>
     </testsuite>
-    <testsuite name="src/__tests__/useObservability.test.ts" timestamp="2026-06-15T21:52:14.587Z" hostname="Komails-MacBook-Air.local" tests="5" failures="0" errors="0" skipped="0" time="0.035726709">
-        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; returns the telemetry helpers and onRenderCallback" time="0.023078625">
+    <testsuite name="src/__tests__/telemetry.test.ts" timestamp="2026-06-16T15:45:38.623Z" hostname="Mac.powerhub" tests="7" failures="0" errors="0" skipped="0" time="0.002742084">
+        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; trackEvent adds an info-level event to the buffer" time="0.001545208">
         </testcase>
-        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; onRenderCallback does NOT emit a slow_render event when under threshold" time="0.003972334">
+        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; trackTiming adds a timing-level event with rounded durationMs" time="0.0001825">
         </testcase>
-        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; onRenderCallback emits a slow_render timing event when over threshold" time="0.003372875">
+        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; logError adds an error-level event to the buffer" time="0.000144542">
+        </testcase>
+        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; events include a sessionId and timestamp" time="0.000202875">
+        </testcase>
+        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; getEvents returns a readonly snapshot of the buffer" time="0.000055208">
+        </testcase>
+        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; setTransport calls the transport function with emitted events" time="0.000059667">
+        </testcase>
+        <testcase classname="src/__tests__/telemetry.test.ts" name="telemetry &gt; events without metadata omit the metadata key" time="0.000047459">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/useObservability.test.ts" timestamp="2026-06-16T15:45:38.623Z" hostname="Mac.powerhub" tests="5" failures="0" errors="0" skipped="0" time="0.014660042">
+        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; returns the telemetry helpers and onRenderCallback" time="0.0070075">
+        </testcase>
+        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; onRenderCallback does NOT emit a slow_render event when under threshold" time="0.001899375">
+        </testcase>
+        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; onRenderCallback emits a slow_render timing event when over threshold" time="0.001767458">
             <system-err>
 [Profiler] &lt;PaymentsPage&gt; (update) took 100.0ms — threshold: 50ms
 
             </system-err>
         </testcase>
-        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; uses default 16ms threshold when no config given" time="0.001668416">
+        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; uses default 16ms threshold when no config given" time="0.001101125">
             <system-err>
 [Profiler] &lt;TestId&gt; (mount) took 20.0ms — threshold: 16ms
 
             </system-err>
         </testcase>
-        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; trackEvent and logError are the same references as telemetry exports" time="0.002190917">
+        <testcase classname="src/__tests__/useObservability.test.ts" name="useObservability &gt; trackEvent and logError are the same references as telemetry exports" time="0.001971042">
         </testcase>
     </testsuite>
-    <testsuite name="src/__tests__/usePaymentFilters.test.ts" timestamp="2026-06-15T21:52:14.587Z" hostname="Komails-MacBook-Air.local" tests="10" failures="0" errors="0" skipped="0" time="0.037394084">
-        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; initialises with INITIAL_FILTERS defaults" time="0.015376">
+    <testsuite name="src/__tests__/usePaymentFilters.test.ts" timestamp="2026-06-16T15:45:38.624Z" hostname="Mac.powerhub" tests="10" failures="0" errors="0" skipped="0" time="0.019472875">
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; initialises with INITIAL_FILTERS defaults" time="0.0107125">
         </testcase>
-        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setInputValue updates inputValue without committing search" time="0.001420792">
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setInputValue updates inputValue without committing search" time="0.001307333">
         </testcase>
-        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; commitSearch commits trimmed inputValue and resets page to 1" time="0.00379075">
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; commitSearch commits trimmed inputValue and resets page to 1" time="0.001101916">
         </testcase>
-        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setCurrency updates currency and resets page to 1" time="0.001797208">
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setCurrency updates currency and resets page to 1" time="0.001098667">
         </testcase>
-        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setPage updates page" time="0.002328875">
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setPage updates page" time="0.001132583">
         </testcase>
-        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setPageSize updates pageSize and resets page to 1" time="0.001833792">
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setPageSize updates pageSize and resets page to 1" time="0.000633875">
         </testcase>
-        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; clearFilters resets everything but preserves pageSize" time="0.00220075">
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; clearFilters resets everything but preserves pageSize" time="0.001167458">
         </testcase>
-        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setSort on a new field defaults to asc" time="0.00123375">
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setSort on a new field defaults to asc" time="0.0004165">
         </testcase>
-        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setSort on the same field with asc toggles to desc" time="0.0009145">
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setSort on the same field with asc toggles to desc" time="0.000398542">
         </testcase>
-        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setSort resets page to 1" time="0.000593334">
+        <testcase classname="src/__tests__/usePaymentFilters.test.ts" name="usePaymentFilters &gt; setSort resets page to 1" time="0.000400584">
         </testcase>
     </testsuite>
 </testsuites>

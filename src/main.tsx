@@ -11,17 +11,37 @@ async function enableMocking() {
 
   try {
     const { worker } = await import('./mocks/browser');
-    await worker.start({
-      onUnhandledRequest: 'bypass',
-      serviceWorker: {
-        options: {
-          // Always fetch the latest SW script, bypassing the HTTP cache.
-          // Prevents the "wrong version" warning after MSW upgrades.
-          updateViaCache: 'none',
+
+    const startWorker = () =>
+      worker.start({
+        // 'warn' (not 'bypass') surfaces any request MSW didn't intercept,
+        // instead of silently letting it hit the real network and return an
+        // empty/404 response that looks like "no data".
+        onUnhandledRequest: 'warn',
+        serviceWorker: {
+          options: {
+            // Always fetch the latest SW script, bypassing the HTTP cache.
+            // Prevents the "wrong version" warning after MSW upgrades.
+            updateViaCache: 'none',
+          },
         },
-      },
-    });
+      });
+
+    await startWorker();
     console.log('Mock Service Worker started');
+
+    // The browser terminates an idle service worker after the tab sits
+    // inactive. The next fetch (e.g. applying a filter) can then fire before
+    // the worker has woken up, fall through to the real network, and return
+    // no data. Re-arm the worker whenever the tab becomes visible again so
+    // it's guaranteed active before that fetch. worker.start() is idempotent.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        startWorker().catch((error) =>
+          console.error('Failed to re-arm Mock Service Worker:', error),
+        );
+      }
+    });
   } catch (error) {
     console.error('Failed to start Mock Service Worker:', error);
   }
